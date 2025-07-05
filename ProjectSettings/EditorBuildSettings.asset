@@ -6,6 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scene/SampleScene.unity
-    guid: af97ceb037c60d94193dd5ce7869b310
+    path: Assets/KPlugin/AppLovinMax/Example/Demo_InitAppLovinMax.unity
+    guid: 19ce467086fe8cd40b3ad0d8d5d01db7
+  - enabled: 1
+    path: Assets/KPlugin/AppLovinMax/Example/Demo_AppLovinMax.unity
+    guid: 2981ca21dfc6ab24e82a0d15157c7994
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

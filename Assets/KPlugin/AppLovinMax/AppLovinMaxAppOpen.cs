@@ -1,6 +1,5 @@
 ﻿using KTool.Advertisement;
 using KTool.Init;
-using KTool;
 using System.Collections;
 using UnityEngine;
 
@@ -9,10 +8,13 @@ namespace KPlugin.AppLovinMax
     public class AppLovinMaxAppOpen : AdAppOpen, IIniter
     {
         #region Properties
-        private const string ERROR_LOAD_FAIL = "Ad AppOpen load fail code: {0}",
-            ERROR_DISPLAY_FAIL = "Ad AppOpen display fail code: {0}",
-            ERROR_SHOW_FAIL_AD_NOT_READY = "Ad AppOpen show fail: ad not ready",
-            ERROR_SHOW_FAIL_AD_IS_SHOWED = "Ad AppOpen show fail: ad is show";
+        private const string ERROR_LOAD_FAIL = "Ad load fail code: {0}",
+            ERROR_DISPLAY_FAIL = "Ad display fail code: {0}",
+            ERROR_SHOW_FAIL_AD_IS_DESTROY = "Ad show fail: ad  is destroyed",
+            ERROR_SHOW_FAIL_AD_NOT_INIT = "Ad show fail: ad not inited",
+            ERROR_SHOW_FAIL_AD_NOT_LOADED = "Ad show fail: ad not loaded",
+            ERROR_SHOW_FAIL_AD_NOT_READY = "Ad show fail: ad not ready",
+            ERROR_SHOW_FAIL_AD_IS_SHOWED = "Ad show fail: ad is showing";
 
         [SerializeField]
         private bool initIndispensable;
@@ -21,7 +23,8 @@ namespace KPlugin.AppLovinMax
         [SerializeField, SelectAdId(AppLovinMaxAdType.AppOpen)]
         private int indexAd = 0;
 
-        private bool isLoading;
+        private bool isIniting,
+            isLoading;
         private int attemptLoad;
         private InitTrackingSource initTrackingSource;
         private AdAppOpenTrackingSource adTrackingSource;
@@ -41,8 +44,6 @@ namespace KPlugin.AppLovinMax
             get => base.IsAutoReload;
             protected set
             {
-                if (value == base.IsAutoReload)
-                    return;
                 base.IsAutoReload = value;
                 if (base.IsAutoReload)
                     Load();
@@ -63,53 +64,84 @@ namespace KPlugin.AppLovinMax
         #region Init
         public InitTracking InitBegin()
         {
+            if (IsDestroy || IsInited || initTrackingSource != null)
+                return InitTracking.Fail;
+            //
             initTrackingSource = new InitTrackingSource(initIndispensable);
-            Load();
+            OnAdInited += Init_OnAdInited;
+            Init();
             return initTrackingSource;
         }
         public void InitEnd()
         {
 
         }
+        private void Init_OnAdInited(Ad source, bool isSuccess)
+        {
+            OnAdInited -= Init_OnAdInited;
+            if (isSuccess)
+            {
+                OnAdLoaded += Init_OnLoaded;
+                Load();
+            }
+            else
+            {
+                initTrackingSource.CompleteFail();
+                initTrackingSource = null;
+            }
+        }
+        private void Init_OnLoaded(Ad source, bool isSuccess)
+        {
+            OnAdLoaded -= Init_OnLoaded;
+            if (isSuccess)
+                initTrackingSource.CompleteSuccess();
+            else
+                initTrackingSource.CompleteFail();
+            initTrackingSource = null;
+        }
         #endregion
 
         #region Methods
-
         public override void Init()
         {
-            if (IsInited)
+            if (IsInited || isIniting)
                 return;
+            isIniting = true;
             //
             if (setInstance)
                 instance = this;
-            IsInited = true;
-            Ad_EventRegister();
-            PushEvent_Inited();
+            StartCoroutine(Ad_Create());
         }
         public override void Load()
         {
-            Init();
-            //
-            if (IsLoaded)
+            if (!IsInited || IsLoaded || isLoading)
                 return;
+            isLoading = true;
             //
-            Ad_Create();
+            StartCoroutine(Ad_Load());
         }
         public override void Destroy()
         {
             IsDestroy = true;
-            if (!IsShow)
-            {
-                Ad_EventUnRegister();
+            if (isIniting || isLoading || IsShow)
+                return;
+            if (IsInited)
+                Ad_Destroy();
+            else
                 PushEvent_Destroy();
-            }
         }
         public override AdAppOpenTracking Show()
         {
-            if (IsShow)
-                return new AdAppOpenTrackingSource(ERROR_SHOW_FAIL_AD_IS_SHOWED);
+            if (IsDestroy)
+                return new AdAppOpenTrackingSource(ERROR_SHOW_FAIL_AD_IS_DESTROY);
+            if (!IsInited)
+                return new AdAppOpenTrackingSource(ERROR_SHOW_FAIL_AD_NOT_INIT);
+            if (!IsLoaded)
+                return new AdAppOpenTrackingSource(ERROR_SHOW_FAIL_AD_NOT_LOADED);
             if (!IsReady)
                 return new AdAppOpenTrackingSource(ERROR_SHOW_FAIL_AD_NOT_READY);
+            if (IsShow)
+                return new AdAppOpenTrackingSource(ERROR_SHOW_FAIL_AD_IS_SHOWED);
             //
             adTrackingSource = new AdAppOpenTrackingSource(this);
             IsShow = true;
@@ -119,24 +151,41 @@ namespace KPlugin.AppLovinMax
         #endregion
 
         #region Ad
-        private void Ad_Create()
+        private IEnumerator Ad_Create()
         {
-            if (isLoading)
-                return;
-            isLoading = true;
-            //
-            CoroutineManager.Instance.Coroutine_Start(Ad_LoadAd());
-        }
-        private IEnumerator Ad_LoadAd()
-        {
-            if (attemptLoad > 0)
-            {
-                float delay = Mathf.Pow(2, attemptLoad);
-                yield return new WaitForSecondsRealtime(delay);
-            }
-            //
             while (!AppLovinMaxManager.IsInit)
                 yield return new WaitForEndOfFrame();
+            //
+            if (IsDestroy)
+            {
+                isIniting = false;
+                PushEvent_Inited(false);
+                PushEvent_Destroy();
+                yield break;
+            }
+            //
+            Ad_EventRegister();
+            IsInited = true;
+            isIniting = false;
+            PushEvent_Inited(true);
+        }
+        private void Ad_Destroy()
+        {
+            Ad_EventUnRegister();
+            PushEvent_Destroy();
+        }
+        private IEnumerator Ad_Load()
+        {
+            if (attemptLoad > 0)
+                yield return new WaitForSecondsRealtime(attemptLoad * 2);
+            //
+            if (IsDestroy)
+            {
+                isLoading = false;
+                PushEvent_Loaded(false);
+                Ad_Destroy();
+                yield break;
+            }
             //
             MaxSdk.LoadAppOpenAd(AdId);
         }
@@ -166,37 +215,43 @@ namespace KPlugin.AppLovinMax
         {
             if (adId != AdId)
                 return;
-            isLoading = false;
-            //
-            if (initTrackingSource != null)
-            {
-                initTrackingSource.CompleteSuccess();
-                initTrackingSource = null;
-            }
             //
             attemptLoad = 0;
             IsLoaded = true;
-            PushEvent_Loaded(true);
+            isLoading = false;
+            if (IsDestroy)
+            {
+                PushEvent_Loaded(true);
+                //
+                Ad_Destroy();
+            }
+            else
+            {
+                PushEvent_Loaded(true);
+            }
         }
         private void Ad_OnAdLoadFailedEvent(string adId, MaxSdkBase.ErrorInfo errorInfo)
         {
             if (adId != AdId)
                 return;
-            isLoading = false;
             //
             if (errorInfo != null)
                 Debug.LogWarning(string.Format(ERROR_LOAD_FAIL, errorInfo.Code));
-            if (initTrackingSource != null)
-            {
-                initTrackingSource.CompleteFail();
-                initTrackingSource = null;
-            }
             //
             attemptLoad = Mathf.Min(attemptLoad + 1, 6);
-            PushEvent_Loaded(false);
-            if (!IsDestroy && IsAutoReload)
-                Ad_Create();
-            return;
+            if (IsDestroy)
+            {
+                isLoading = false;
+                PushEvent_Loaded(false);
+                //
+                Ad_Destroy();
+            }
+            else
+            {
+                if (IsAutoReload)
+                    StartCoroutine(Ad_Load());
+                PushEvent_Loaded(false);
+            }
         }
         private void Ad_OnAdDisplayedEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {
@@ -210,20 +265,30 @@ namespace KPlugin.AppLovinMax
         {
             if (adId != AdId)
                 return;
-            IsShow = false;
             //
             if (errorInfo != null)
                 Debug.LogWarning(string.Format(ERROR_DISPLAY_FAIL, errorInfo.Code));
-            PushEvent_Displayed(false);
-            adTrackingSource.Displayed(false);
             //
+            IsLoaded = false;
+            IsShow = false;
             if (IsDestroy)
             {
-                Ad_EventUnRegister();
-                PushEvent_Destroy();
+                PushEvent_Displayed(false);
+                adTrackingSource.Displayed(false);
+                //
+                Ad_Destroy();
             }
-            else if (IsAutoReload)
-                Ad_Create();
+            else
+            {
+
+                if (IsAutoReload)
+                {
+                    isLoading = true;
+                    StartCoroutine(Ad_Load());
+                }
+                PushEvent_Displayed(false);
+                adTrackingSource.Displayed(false);
+            }
         }
         private void Ad_OnAdClickedEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {
@@ -237,18 +302,26 @@ namespace KPlugin.AppLovinMax
         {
             if (adId != AdId)
                 return;
+            //
+            IsLoaded = false;
             IsShow = false;
-            //
-            PushEvent_Hidden();
-            adTrackingSource.Hidden();
-            //
             if (IsDestroy)
             {
-                Ad_EventUnRegister();
-                PushEvent_Destroy();
+                PushEvent_Hidden();
+                adTrackingSource.Hidden();
+                //
+                Ad_Destroy();
             }
-            else if (IsAutoReload)
-                Ad_Create();
+            else
+            {
+                if (IsAutoReload)
+                {
+                    isLoading = true;
+                    StartCoroutine(Ad_Load());
+                }
+                PushEvent_Hidden();
+                adTrackingSource.Hidden();
+            }
         }
         private void Ad_OnAdRevenuePaidEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {

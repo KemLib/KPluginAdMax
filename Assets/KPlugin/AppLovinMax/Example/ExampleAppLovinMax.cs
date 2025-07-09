@@ -12,6 +12,8 @@ namespace KPlugin.AppLovinMax.Example
         [SerializeField]
         private PanelAdBanner panelAdBanner;
         [SerializeField]
+        private PanelAdMRec panelAdMRec;
+        [SerializeField]
         private PanelAdInterstitial panelAdInterstitial;
         [SerializeField]
         private PanelAdRewarded panelAdRewarded;
@@ -30,6 +32,7 @@ namespace KPlugin.AppLovinMax.Example
             panelLog.Init();
             panelAdAppOpen.Init(panelLog);
             panelAdBanner.Init(panelLog);
+            panelAdMRec.Init(panelLog);
             panelAdInterstitial.Init(panelLog);
             panelAdRewarded.Init(panelLog);
             //
@@ -42,6 +45,7 @@ namespace KPlugin.AppLovinMax.Example
         {
             panelAdAppOpen.Show();
             panelAdBanner.Hide();
+            panelAdMRec.Hide();
             panelAdInterstitial.Hide();
             panelAdRewarded.Hide();
         }
@@ -49,6 +53,15 @@ namespace KPlugin.AppLovinMax.Example
         {
             panelAdAppOpen.Hide();
             panelAdBanner.Show();
+            panelAdMRec.Hide();
+            panelAdInterstitial.Hide();
+            panelAdRewarded.Hide();
+        }
+        public void OnClick_MRec()
+        {
+            panelAdAppOpen.Hide();
+            panelAdBanner.Hide();
+            panelAdMRec.Show();
             panelAdInterstitial.Hide();
             panelAdRewarded.Hide();
         }
@@ -56,6 +69,7 @@ namespace KPlugin.AppLovinMax.Example
         {
             panelAdAppOpen.Hide();
             panelAdBanner.Hide();
+            panelAdMRec.Hide();
             panelAdInterstitial.Show();
             panelAdRewarded.Hide();
         }
@@ -63,6 +77,7 @@ namespace KPlugin.AppLovinMax.Example
         {
             panelAdAppOpen.Hide();
             panelAdBanner.Hide();
+            panelAdMRec.Hide();
             panelAdInterstitial.Hide();
             panelAdRewarded.Show();
         }

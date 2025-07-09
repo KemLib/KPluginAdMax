@@ -49,7 +49,7 @@ namespace KPlugin.AppLovinMax
                     return appOpenIds.Length;
                 case AppLovinMaxAdType.Banner:
                     return bannerIds.Length;
-                case AppLovinMaxAdType.Mrec:
+                case AppLovinMaxAdType.MRec:
                     return mrecIds.Length;
                 case AppLovinMaxAdType.Interstitial:
                     return interstitialIds.Length;
@@ -67,7 +67,7 @@ namespace KPlugin.AppLovinMax
                     return appOpenIds[index];
                 case AppLovinMaxAdType.Banner:
                     return bannerIds[index];
-                case AppLovinMaxAdType.Mrec:
+                case AppLovinMaxAdType.MRec:
                     return mrecIds[index];
                 case AppLovinMaxAdType.Interstitial:
                     return interstitialIds[index];

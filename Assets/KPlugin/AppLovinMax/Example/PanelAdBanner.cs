@@ -22,7 +22,7 @@ namespace KPlugin.AppLovinMax.Example
         private const string ERROR_ADD_EMPTY = "Ad Banner: No objects to select",
             ERROR_AD_IS_INITED = "Ad Banner: ad is inited",
             ERROR_AD_IS_NOT_INIT = "Ad Banner: ad not init",
-            ERROR_AD_IS_LOADED = "Ad Rewarded: ad is loaded";
+            ERROR_AD_IS_LOADED = "Ad Banner: ad is loaded";
 
         [SerializeField]
         private TMP_Dropdown dropdownAd;

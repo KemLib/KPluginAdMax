@@ -16,11 +16,6 @@ namespace KPlugin.AppLovinMax
             get;
             private set;
         }
-        public static bool IsInit
-        {
-            get;
-            private set;
-        }
         public static string CountryCode
         {
             get;
@@ -31,17 +26,22 @@ namespace KPlugin.AppLovinMax
             get => MaxSdk.IsMuted();
             set => MaxSdk.SetMuted(value);
         }
+
         [SerializeField, GetComponent(GetComponentType.InGameObject_AllChildren, true)]
         private AppLovinMaxAppOpen[] adAppOpens;
         [SerializeField, GetComponent(GetComponentType.InGameObject_AllChildren, true)]
         private AppLovinMaxBanner[] adBanners;
         [SerializeField, GetComponent(GetComponentType.InGameObject_AllChildren, true)]
+        private AppLovinMaxMRec[] adMRecs;
+        [SerializeField, GetComponent(GetComponentType.InGameObject_AllChildren, true)]
         private AppLovinMaxInterstitial[] adInterstitials;
         [SerializeField, GetComponent(GetComponentType.InGameObject_AllChildren, true)]
         private AppLovinMaxRewarded[] adRewardeds;
 
+        private bool isInit;
         private InitTrackingSource initTrackingSource;
 
+        public bool IsInit => isInit;
         private bool IsIniting => initTrackingSource != null;
         #endregion
 
@@ -93,23 +93,22 @@ namespace KPlugin.AppLovinMax
         private void Max_OnSdkInitializedEvent(MaxSdkBase.SdkConfiguration sdkConfiguration)
         {
             if (MaxSdk.IsInitialized())
-                StartCoroutine(IE_CompleteInit());
+            {
+                isInit = true;
+                initTrackingSource.CompleteSuccess();
+                initTrackingSource = null;
+                //
+                CountryCode = MaxSdk.GetSdkConfiguration().CountryCode;
+            }
             else
+            {
                 StartCoroutine(IE_MaxInit());
+            }
         }
         private IEnumerator IE_MaxInit()
         {
             yield return new WaitForEndOfFrame();
             MaxSdk.InitializeSdk();
-        }
-        private IEnumerator IE_CompleteInit()
-        {
-            yield return new WaitForSeconds(2);
-            //
-            IsInit = true;
-            initTrackingSource.CompleteSuccess();
-            initTrackingSource = null;
-            CountryCode = MaxSdk.GetSdkConfiguration().CountryCode;
         }
         #endregion
 
@@ -147,6 +146,26 @@ namespace KPlugin.AppLovinMax
         public AppLovinMaxBanner Banner_Get(string adName)
         {
             foreach (var ad in adBanners)
+                if (ad.Name == adName)
+                    return ad;
+            return null;
+        }
+        #endregion
+
+        #region MRec
+        public int MRec_Count()
+        {
+            return adMRecs.Length;
+        }
+        public AppLovinMaxMRec MRec_Get(int index)
+        {
+            if (index < 0 || index >= adMRecs.Length)
+                return null;
+            return adMRecs[index];
+        }
+        public AppLovinMaxMRec MRec_Get(string adName)
+        {
+            foreach (var ad in adMRecs)
                 if (ad.Name == adName)
                     return ad;
             return null;

@@ -86,11 +86,8 @@ namespace KPlugin.AppLovinMax
             get => base.PositionType;
             protected set
             {
-                if (value == base.PositionType)
-                    return;
-                //
                 base.PositionType = value;
-                if (IsReady)
+                if (IsInited)
                 {
                     MaxSdk.UpdateBannerPosition(AdId, Utility.ConvertPosition(PositionType));
                 }
@@ -141,7 +138,11 @@ namespace KPlugin.AppLovinMax
             if (isSuccess)
             {
                 OnAdLoaded += Init_OnLoaded;
-                Load();
+                if (!isLoading)
+                {
+                    isLoading = true;
+                    StartCoroutine(Ad_Load());
+                }
             }
             else
             {
@@ -173,7 +174,7 @@ namespace KPlugin.AppLovinMax
         }
         public override void Load()
         {
-            if (!IsInited || IsLoaded || isLoading)
+            if (!IsInited || IsLoaded || IsAutoReload || isLoading)
                 return;
             isLoading = true;
             //
@@ -182,10 +183,14 @@ namespace KPlugin.AppLovinMax
         public override void Destroy()
         {
             IsDestroy = true;
-            if (isIniting || isLoading || IsShow)
+            if (isIniting || isLoading)
                 return;
             if (IsInited)
+            {
+                if (IsShow)
+                    Hide();
                 Ad_Destroy();
+            }
             else
                 PushEvent_Destroy();
         }
@@ -235,13 +240,14 @@ namespace KPlugin.AppLovinMax
         #region Ad
         private IEnumerator Ad_Create()
         {
-            while (!AppLovinMaxManager.IsInit)
+            while (!AppLovinMaxManager.Instance.IsInit)
                 yield return new WaitForEndOfFrame();
             //
             if (IsDestroy)
             {
                 isIniting = false;
                 PushEvent_Inited(false);
+                //
                 PushEvent_Destroy();
                 yield break;
             }
@@ -278,11 +284,14 @@ namespace KPlugin.AppLovinMax
         {
             if (attemptLoad > 0)
                 yield return new WaitForSecondsRealtime(attemptLoad * 2);
+            else
+                yield return new WaitForEndOfFrame();
             //
             if (IsDestroy)
             {
                 isLoading = false;
                 PushEvent_Loaded(false);
+                //
                 Ad_Destroy();
                 yield break;
             }
@@ -326,9 +335,17 @@ namespace KPlugin.AppLovinMax
             }
             else
             {
-                if (!IsShow)
-                    MaxSdk.HideBanner(AdId);
                 PushEvent_Loaded(true);
+                if (IsShow)
+                {
+                    MaxSdk.ShowBanner(AdId);
+                    PushEvent_Displayed(true);
+                    adTrackingSource.Displayed(true);
+                }
+                else
+                {
+                    MaxSdk.HideBanner(AdId);
+                }
             }
         }
         private void Ad_OnAdLoadFailedEvent(string adId, ErrorInfo errorInfo)
@@ -340,6 +357,7 @@ namespace KPlugin.AppLovinMax
                 Debug.LogWarning(string.Format(ERROR_LOAD_FAIL, errorInfo.Code));
             //
             attemptLoad = Mathf.Min(attemptLoad + 1, 6);
+            IsLoaded = false;
             if (IsDestroy)
             {
                 isLoading = false;
@@ -351,6 +369,8 @@ namespace KPlugin.AppLovinMax
             {
                 if (IsAutoReload)
                     StartCoroutine(Ad_Load());
+                else
+                    isLoading = false;
                 PushEvent_Loaded(false);
             }
         }

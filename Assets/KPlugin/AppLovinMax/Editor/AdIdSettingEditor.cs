@@ -105,7 +105,7 @@ namespace KPlugin.AppLovinMax.Editor
                     return TEST_AD_ANDROID_APP_OPEN_ID;
                 case AppLovinMaxAdType.Banner:
                     return TEST_AD_ANDROID_BANNER_ID;
-                case AppLovinMaxAdType.Mrec:
+                case AppLovinMaxAdType.MRec:
                     return TEST_AD_ANDROID_MREC_ID;
                 case AppLovinMaxAdType.Interstitial:
                     return TEST_AD_ANDROID_INTERSTITIAL_ID;
@@ -123,7 +123,7 @@ namespace KPlugin.AppLovinMax.Editor
                     return TEST_AD_IOS_APP_OPEN_ID;
                 case AppLovinMaxAdType.Banner:
                     return TEST_AD_IOS_BANNER_ID;
-                case AppLovinMaxAdType.Mrec:
+                case AppLovinMaxAdType.MRec:
                     return TEST_AD_IOS_MRECT_ID;
                 case AppLovinMaxAdType.Interstitial:
                     return TEST_AD_IOS_INTERSTITIAL_ID;

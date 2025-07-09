@@ -153,13 +153,14 @@ namespace KPlugin.AppLovinMax
         #region Ad
         private IEnumerator Ad_Create()
         {
-            while (!AppLovinMaxManager.IsInit)
+            while (!AppLovinMaxManager.Instance.IsInit)
                 yield return new WaitForEndOfFrame();
             //
             if (IsDestroy)
             {
                 isIniting = false;
                 PushEvent_Inited(false);
+                //
                 PushEvent_Destroy();
                 yield break;
             }
@@ -178,11 +179,14 @@ namespace KPlugin.AppLovinMax
         {
             if (attemptLoad > 0)
                 yield return new WaitForSecondsRealtime(attemptLoad * 2);
+            else
+                yield return new WaitForEndOfFrame();
             //
             if (IsDestroy)
             {
                 isLoading = false;
                 PushEvent_Loaded(false);
+                //
                 Ad_Destroy();
                 yield break;
             }
@@ -241,6 +245,7 @@ namespace KPlugin.AppLovinMax
                 Debug.LogWarning(string.Format(ERROR_LOAD_FAIL, errorInfo.Code));
             //
             attemptLoad = Mathf.Min(attemptLoad + 1, 6);
+            IsLoaded = false;
             if (IsDestroy)
             {
                 isLoading = false;
@@ -252,6 +257,8 @@ namespace KPlugin.AppLovinMax
             {
                 if (IsAutoReload)
                     StartCoroutine(Ad_Load());
+                else
+                    isLoading = false;
                 PushEvent_Loaded(false);
             }
         }
@@ -282,7 +289,6 @@ namespace KPlugin.AppLovinMax
             }
             else
             {
-
                 if (IsAutoReload)
                 {
                     isLoading = true;

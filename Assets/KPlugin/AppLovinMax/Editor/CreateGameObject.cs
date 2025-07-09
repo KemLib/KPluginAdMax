@@ -9,6 +9,7 @@ namespace KPlugin.AppLovinMax.Editor
         private const string GAME_OBJECT_NAME_MANAGER = "KPlugin_AppLovinMax_Manager",
             GAME_OBJECT_NAME_APP_OPEN = "KPlugin_AppLovinMax_AppOpen",
             GAME_OBJECT_NAME_BANNER = "KPlugin_AppLovinMax_Banner",
+            GAME_OBJECT_NAME_MREC = "KPlugin_AppLovinMax_MRec",
             GAME_OBJECT_NAME_INTERSTITIAL = "KPlugin_AppLovinMax_Interstitial",
             GAME_OBJECT_NAME_REWARDED = "KPlugin_AppLovinMax_Rewarded";
         #endregion
@@ -44,7 +45,17 @@ namespace KPlugin.AppLovinMax.Editor
                 newGO.transform.SetParent(Selection.activeTransform);
             Selection.activeGameObject = newGO;
         }
-        [MenuItem("GameObject/KPlugin/AppLovinMax/Create Ad Interstitial", priority = 3)]
+        [MenuItem("GameObject/KPlugin/AppLovinMax/Create Ad MRec", priority = 3)]
+        private static void Create_AdMRec()
+        {
+            GameObject newGO = new GameObject(GAME_OBJECT_NAME_MREC);
+            newGO.AddComponent<AppLovinMaxMRec>();
+            //
+            if (Selection.activeTransform != null)
+                newGO.transform.SetParent(Selection.activeTransform);
+            Selection.activeGameObject = newGO;
+        }
+        [MenuItem("GameObject/KPlugin/AppLovinMax/Create Ad Interstitial", priority = 4)]
         private static void Create_AdInterstitial()
         {
             GameObject newGO = new GameObject(GAME_OBJECT_NAME_INTERSTITIAL);
@@ -54,7 +65,7 @@ namespace KPlugin.AppLovinMax.Editor
                 newGO.transform.SetParent(Selection.activeTransform);
             Selection.activeGameObject = newGO;
         }
-        [MenuItem("GameObject/KPlugin/AppLovinMax/Create Ad Rewarded", priority = 4)]
+        [MenuItem("GameObject/KPlugin/AppLovinMax/Create Ad Rewarded", priority = 5)]
         private static void Create_AdRewarded()
         {
             GameObject newGO = new GameObject(GAME_OBJECT_NAME_REWARDED);

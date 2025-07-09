@@ -4,36 +4,36 @@ using UnityEngine;
 
 namespace KPlugin.AppLovinMax.Example
 {
-    public class PanelAdAppOpen : MonoBehaviour
+    public class PanelAdMRec : MonoBehaviour
     {
         #region Properties
-        private const string CLICK_INIT = "Ad AppOpen: Click init",
-            CLICK_LOAD = "Ad AppOpen: Click load",
-            CLICK_SHOW = "Ad AppOpen: Click show";
-        private const string AD_EVENT_INIT = "Ad AppOpen: even Init",
-            AD_EVENT_LOADED = "Ad AppOpen: even Loaded {0}",
-            AD_EVENT_DISPLAYED = "Ad AppOpen: even Displayed {0}",
-            AD_EVENT_CLICKED = "Ad AppOpen: even Clicked",
-            AD_EVENT_HIDDEN = "Ad AppOpen: even Hidden",
-            AD_EVENT_REVENUE_PAID = "Ad AppOpen: even RevenuePaid {0}-{1}",
-            AD_EVENT_DESTROY = "Ad AppOpen: even Destroy";
-        private const string ERROR_ADD_EMPTY = "Ad AppOpen: No objects to select",
-            ERROR_AD_IS_INITED = "Ad AppOpen: ad is inited",
-            ERROR_AD_IS_NOT_INIT = "Ad AppOpen: ad not init",
-            ERROR_AD_IS_LOADED = "Ad AppOpen: ad is loaded",
-            ERROR_AD_SHOW = "Ad AppOpen show success",
-            ERROR_AD_SHOW_FAIL = "Ad AppOpen show fail: {0}";
+        private const string CLICK_INIT = "Ad MRec: Click init",
+            CLICK_LOAD = "Ad MRec: Click load",
+            CLICK_SHOW = "Ad MRec: Click show",
+            CLICK_HIDE = "Ad MRec: Click hide";
+        private const string AD_EVENT_INIT = "Ad MRec: even Init",
+            AD_EVENT_LOADED = "Ad MRec: even Loaded {0}",
+            AD_EVENT_DISPLAYED = "Ad MRec: even Displayed {0}",
+            AD_EVENT_CLICKED = "Ad MRec: even Clicked",
+            AD_EVENT_HIDDEN = "Ad MRec: even Hidden",
+            AD_EVENT_REVENUE_PAID = "Ad MRec: even RevenuePaid {0}-{1}",
+            AD_EVENT_DESTROY = "Ad MRec: even Destroy",
+            AD_EVENT_EXPANDED = "Ad MRec: even Expanded {0}";
+        private const string ERROR_ADD_EMPTY = "Ad MRec: No objects to select",
+            ERROR_AD_IS_INITED = "Ad MRec: ad is inited",
+            ERROR_AD_IS_NOT_INIT = "Ad MRec: ad not init",
+            ERROR_AD_IS_LOADED = "Ad MRec: ad is loaded";
 
         [SerializeField]
         private TMP_Dropdown dropdownAd;
 
         private PanelLog panelLog;
-        private AppLovinMaxAppOpen selectAd;
+        private AppLovinMaxMRec selectAd;
 
         private AppLovinMaxManager manager => AppLovinMaxManager.Instance;
         public bool IsShow => gameObject.activeSelf;
         public int Count => dropdownAd.options.Count;
-        public AppLovinMaxAppOpen SelectAd => selectAd;
+        public AppLovinMaxMRec SelectAd => selectAd;
         #endregion
 
         #region Unity Events
@@ -45,17 +45,17 @@ namespace KPlugin.AppLovinMax.Example
         {
             this.panelLog = panelLog;
             //
-            if (manager == null || manager.AppOpen_Count() == 0)
+            if (manager == null || manager.Banner_Count() == 0)
             {
                 dropdownAd.options.Clear();
                 return;
             }
             //
             dropdownAd.options.Clear();
-            int count = manager.AppOpen_Count();
+            int count = manager.Banner_Count();
             for (int i = 0; i < count; i++)
             {
-                AppLovinMaxAppOpen ad = manager.AppOpen_Get(i);
+                AppLovinMaxMRec ad = manager.MRec_Get(i);
                 dropdownAd.options.Add(new TMP_Dropdown.OptionData(ad.Name));
             }
             dropdownAd.value = 0;
@@ -88,7 +88,7 @@ namespace KPlugin.AppLovinMax.Example
         public void OnSelectAd(int value)
         {
             SelectAd_EventUnRegister();
-            selectAd = manager.AppOpen_Get(value);
+            selectAd = manager.MRec_Get(value);
             SelectAd_EventRegister();
         }
         public void OnClick_Init()
@@ -124,11 +124,16 @@ namespace KPlugin.AppLovinMax.Example
             //
             panelLog.AddLog(CLICK_SHOW);
             //
-            AdAppOpenTracking adTracking = SelectAd.Show();
-            if (adTracking.IsShow)
-                panelLog.AddLog(ERROR_AD_SHOW);
-            else
-                panelLog.AddLog(string.Format(ERROR_AD_SHOW_FAIL, adTracking.ErrorMessage));
+            SelectAd.Show();
+        }
+        public void OnClick_Hide()
+        {
+            if (!IsShow)
+                return;
+            //
+            panelLog.AddLog(CLICK_HIDE);
+            //
+            SelectAd.Hide();
         }
         #endregion
 
@@ -145,6 +150,7 @@ namespace KPlugin.AppLovinMax.Example
             selectAd.OnAdHidden += SelectAd_OnAdHidden;
             selectAd.OnAdRevenuePaid += SelectAd_OnAdRevenuePaid;
             selectAd.OnAdDestroy += SelectAd_OnAdDestroy;
+            selectAd.OnAdExpanded += SelectAd_OnAdExpanded;
         }
         private void SelectAd_EventUnRegister()
         {
@@ -186,6 +192,10 @@ namespace KPlugin.AppLovinMax.Example
         private void SelectAd_OnAdDestroy(Ad adSource)
         {
             panelLog.AddLog(AD_EVENT_DESTROY);
+        }
+        private void SelectAd_OnAdExpanded(Ad adSource, bool isExpanded)
+        {
+            panelLog.AddLog(string.Format(AD_EVENT_EXPANDED, isExpanded));
         }
         #endregion
     }

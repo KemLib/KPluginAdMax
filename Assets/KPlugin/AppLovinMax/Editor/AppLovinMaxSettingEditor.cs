@@ -70,7 +70,7 @@ namespace KPlugin.AppLovinMax.Editor
                 propertyNativeIds = serializedObject.FindProperty("nativeIds");
             appOpenSetting = new AdIdSettingEditor(propertyAppOpenIds, AppLovinMaxAdType.AppOpen);
             bannerSetting = new AdIdSettingEditor(propertyBannerIds, AppLovinMaxAdType.Banner);
-            mrecSetting = new AdIdSettingEditor(propertyMrecIds, AppLovinMaxAdType.Mrec);
+            mrecSetting = new AdIdSettingEditor(propertyMrecIds, AppLovinMaxAdType.MRec);
             interstitialSetting = new AdIdSettingEditor(propertyInterstitialIds, AppLovinMaxAdType.Interstitial);
             rewardedSetting = new AdIdSettingEditor(propertyRewardedIds, AppLovinMaxAdType.Rewarded);
         }

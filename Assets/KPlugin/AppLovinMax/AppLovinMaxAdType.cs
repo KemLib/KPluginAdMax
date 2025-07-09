@@ -4,7 +4,7 @@ namespace KPlugin.AppLovinMax
     {
         AppOpen,
         Banner,
-        Mrec,
+        MRec,
         Interstitial,
         Rewarded
     }

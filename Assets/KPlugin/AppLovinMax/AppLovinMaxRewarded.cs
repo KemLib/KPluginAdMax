@@ -62,12 +62,12 @@ namespace KPlugin.AppLovinMax
         #endregion
 
         #region Init
-        public InitTracking InitBegin()
+        public IInitTracking InitBegin()
         {
             if (IsDestroy || IsInited || initTrackingSource != null)
-                return InitTracking.Fail;
+                return IInitTracking.Fail;
             //
-            initTrackingSource = new InitTrackingSource(initIndispensable);
+            initTrackingSource = new InitTrackingSource(initIndispensable, true);
             OnAdInited += Init_OnAdInited;
             Init();
             return initTrackingSource;
@@ -130,18 +130,18 @@ namespace KPlugin.AppLovinMax
             else
                 PushEvent_Destroy();
         }
-        public override AdRewardedTracking Show()
+        public override IAdRewardedTracking Show()
         {
             if (IsDestroy)
-                return new AdRewardedTrackingSource(ERROR_SHOW_FAIL_AD_IS_DESTROY);
+                return new AdRewardedTrackingSource(this, ERROR_SHOW_FAIL_AD_IS_DESTROY);
             if (!IsInited)
-                return new AdRewardedTrackingSource(ERROR_SHOW_FAIL_AD_NOT_INIT);
+                return new AdRewardedTrackingSource(this, ERROR_SHOW_FAIL_AD_NOT_INIT);
             if (!IsLoaded)
-                return new AdRewardedTrackingSource(ERROR_SHOW_FAIL_AD_NOT_LOADED);
+                return new AdRewardedTrackingSource(this, ERROR_SHOW_FAIL_AD_NOT_LOADED);
             if (!IsReady)
-                return new AdRewardedTrackingSource(ERROR_SHOW_FAIL_AD_NOT_READY);
+                return new AdRewardedTrackingSource(this, ERROR_SHOW_FAIL_AD_NOT_READY);
             if (IsShow)
-                return new AdRewardedTrackingSource(ERROR_SHOW_FAIL_AD_IS_SHOWED);
+                return new AdRewardedTrackingSource(this, ERROR_SHOW_FAIL_AD_IS_SHOWED);
             //
             adTrackingSource = new AdRewardedTrackingSource(this);
             IsShow = true;
@@ -271,7 +271,7 @@ namespace KPlugin.AppLovinMax
                 return;
             //
             PushEvent_Displayed(true);
-            adTrackingSource.Displayed(true);
+            adTrackingSource.PushEvent_Displayed(true);
         }
         private void Ad_OnAdDisplayFailedEvent(string adId, MaxSdkBase.ErrorInfo errorInfo, MaxSdkBase.AdInfo adInfo)
         {
@@ -286,7 +286,7 @@ namespace KPlugin.AppLovinMax
             if (IsDestroy)
             {
                 PushEvent_Displayed(false);
-                adTrackingSource.Displayed(false);
+                adTrackingSource.PushEvent_Displayed(false);
                 //
                 Ad_Destroy();
             }
@@ -298,7 +298,7 @@ namespace KPlugin.AppLovinMax
                     StartCoroutine(Ad_Load());
                 }
                 PushEvent_Displayed(false);
-                adTrackingSource.Displayed(false);
+                adTrackingSource.PushEvent_Displayed(false);
             }
         }
         private void Ad_OnAdClickedEvent(string adId, MaxSdkBase.AdInfo adInfo)
@@ -307,7 +307,7 @@ namespace KPlugin.AppLovinMax
                 return;
             //
             PushEvent_Clicked();
-            adTrackingSource.Clicked();
+            adTrackingSource.PushEvent_Clicked();
         }
         private void Ad_OnAdHiddenEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {
@@ -319,7 +319,7 @@ namespace KPlugin.AppLovinMax
             if (IsDestroy)
             {
                 PushEvent_Hidden();
-                adTrackingSource.Hidden();
+                adTrackingSource.PushEvent_Hidden();
                 //
                 Ad_Destroy();
             }
@@ -331,7 +331,7 @@ namespace KPlugin.AppLovinMax
                     StartCoroutine(Ad_Load());
                 }
                 PushEvent_Hidden();
-                adTrackingSource.Hidden();
+                adTrackingSource.PushEvent_Hidden();
             }
         }
         private void Ad_OnAdRevenuePaidEvent(string adId, MaxSdkBase.AdInfo adInfo)
@@ -351,7 +351,7 @@ namespace KPlugin.AppLovinMax
                 AppLovinMaxManager.MAX_CURRENCY);
             //
             PushEvent_RevenuePaid(revenuePaid);
-            adTrackingSource.RevenuePaid(revenuePaid);
+            adTrackingSource.PushEvent_RevenuePaid(revenuePaid);
         }
         private void Ad_OnAdReviewCreativeIdGeneratedEvent(string adId, string arg2, MaxSdkBase.AdInfo adInfo)
         {
@@ -370,7 +370,7 @@ namespace KPlugin.AppLovinMax
             //
             AdRewardReceived rewardReceived = new AdRewardReceived(reward.Label, reward.Amount > 0, reward.Amount);
             PushEvent_ReceivedReward(rewardReceived);
-            adTrackingSource.ReceivedReward(rewardReceived);
+            adTrackingSource.PushEvent_ReceivedReward(rewardReceived);
         }
         #endregion
     }

@@ -118,12 +118,12 @@ namespace KPlugin.AppLovinMax
         #endregion
 
         #region Init
-        public InitTracking InitBegin()
+        public IInitTracking InitBegin()
         {
             if (IsDestroy || IsInited || initTrackingSource != null)
-                return InitTracking.Fail;
+                return IInitTracking.Fail;
             //
-            initTrackingSource = new InitTrackingSource(initIndispensable);
+            initTrackingSource = new InitTrackingSource(initIndispensable, true);
             OnAdInited += Init_OnAdInited;
             Init();
             return initTrackingSource;
@@ -194,10 +194,10 @@ namespace KPlugin.AppLovinMax
             else
                 PushEvent_Destroy();
         }
-        public override AdBannerTracking Show()
+        public override IAdBannerTracking Show()
         {
             if (IsDestroy)
-                return new AdBannerTrackingSource(ERROR_IS_DESTROY);
+                return new AdBannerTrackingSource(this, ERROR_IS_DESTROY);
             //
             if (IsShow)
             {
@@ -220,7 +220,7 @@ namespace KPlugin.AppLovinMax
                 IsShow = false;
                 //
                 PushEvent_Hidden();
-                adTrackingSource.Hidden();
+                adTrackingSource.PushEvent_Hidden();
                 adTrackingSource = null;
             }
             else
@@ -233,7 +233,7 @@ namespace KPlugin.AppLovinMax
             yield return new WaitForEndOfFrame();
             MaxSdk.ShowBanner(AdId);
             PushEvent_Displayed(true);
-            adTrackingSource.Displayed(true);
+            adTrackingSource.PushEvent_Displayed(true);
         }
         #endregion
 
@@ -340,7 +340,7 @@ namespace KPlugin.AppLovinMax
                 {
                     MaxSdk.ShowBanner(AdId);
                     PushEvent_Displayed(true);
-                    adTrackingSource.Displayed(true);
+                    adTrackingSource.PushEvent_Displayed(true);
                 }
                 else
                 {
@@ -380,7 +380,7 @@ namespace KPlugin.AppLovinMax
                 return;
             //
             PushEvent_Expanded(true);
-            adTrackingSource.Expanded(true);
+            adTrackingSource.PushEvent_Expanded(true);
         }
         private void Ad_OnAdCollapsedEvent(string adId, AdInfo adInfo)
         {
@@ -388,7 +388,7 @@ namespace KPlugin.AppLovinMax
                 return;
             //
             PushEvent_Expanded(false);
-            adTrackingSource.Expanded(false);
+            adTrackingSource.PushEvent_Expanded(false);
         }
         private void Ad_OnAdClickedEvent(string adId, AdInfo adInfo)
         {
@@ -396,7 +396,7 @@ namespace KPlugin.AppLovinMax
                 return;
             //
             PushEvent_Clicked();
-            adTrackingSource.Clicked();
+            adTrackingSource.PushEvent_Clicked();
         }
         private void Ad_OnAdRevenuePaidEvent(string adId, AdInfo adInfo)
         {
@@ -415,7 +415,7 @@ namespace KPlugin.AppLovinMax
                 AppLovinMaxManager.MAX_CURRENCY);
             //
             PushEvent_RevenuePaid(revenuePaid);
-            adTrackingSource.RevenuePaid(revenuePaid);
+            adTrackingSource.PushEvent_RevenuePaid(revenuePaid);
         }
         private void Ad_OnAdReviewCreativeIdGeneratedEvent(string adId, string arg2, AdInfo adInfo)
         {

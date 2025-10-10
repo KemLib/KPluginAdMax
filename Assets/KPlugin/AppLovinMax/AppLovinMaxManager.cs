@@ -50,7 +50,7 @@ namespace KPlugin.AppLovinMax
         #endregion
 
         #region Init
-        public InitTracking InitBegin()
+        public IInitTracking InitBegin()
         {
             if (Instance == null)
             {
@@ -59,7 +59,7 @@ namespace KPlugin.AppLovinMax
                 return Max_Init();
             }
             //
-            return InitTracking.Success;
+            return IInitTracking.Success;
         }
 
         public void InitEnd()
@@ -78,12 +78,12 @@ namespace KPlugin.AppLovinMax
         #endregion
 
         #region Max
-        private InitTracking Max_Init()
+        private IInitTracking Max_Init()
         {
             if (IsInit || IsIniting)
-                return InitTracking.Success;
+                return IInitTracking.Success;
             //
-            initTrackingSource = new InitTrackingSource(true);
+            initTrackingSource = new InitTrackingSource(true, true);
             if (!string.IsNullOrEmpty(AppLovinMaxSetting.Instance.UserId))
                 MaxSdk.SetUserId(AppLovinMaxSetting.Instance.UserId);
             MaxSdkCallbacks.OnSdkInitializedEvent += Max_OnSdkInitializedEvent;

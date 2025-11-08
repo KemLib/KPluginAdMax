@@ -67,7 +67,7 @@ namespace KPlugin.AppLovinMax
             if (IsDestroy || IsInited || initTrackingSource != null)
                 return IInitTracking.Fail;
             //
-            initTrackingSource = new InitTrackingSource(initIndispensable, true);
+            initTrackingSource = new InitTrackingSource(initIndispensable);
             OnAdInited += Init_OnAdInited;
             Init();
             return initTrackingSource;

@@ -83,7 +83,7 @@ namespace KPlugin.AppLovinMax
             if (IsInit || IsIniting)
                 return IInitTracking.Success;
             //
-            initTrackingSource = new InitTrackingSource(true, true);
+            initTrackingSource = new InitTrackingSource(true);
             if (!string.IsNullOrEmpty(AppLovinMaxSetting.Instance.UserId))
                 MaxSdk.SetUserId(AppLovinMaxSetting.Instance.UserId);
             MaxSdkCallbacks.OnSdkInitializedEvent += Max_OnSdkInitializedEvent;

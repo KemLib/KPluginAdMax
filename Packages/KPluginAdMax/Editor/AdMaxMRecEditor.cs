@@ -15,8 +15,8 @@ namespace KPlugin.AdMax.Editor
             propertyAdSize,
             propertyPosition,
             propertySize,
-            propertySetInstance,
             propertyInitIndispensable,
+            propertySetInstance,
             propertyIndexAd;
         #endregion
 
@@ -29,8 +29,8 @@ namespace KPlugin.AdMax.Editor
             propertyAdSize = serializedObject.FindProperty("adSize");
             propertyPosition = serializedObject.FindProperty("position");
             propertySize = serializedObject.FindProperty("size");
+            propertyInitIndispensable = serializedObject.FindProperty("initIndispensable");
             propertySetInstance = serializedObject.FindProperty("setInstance");
-            propertyInitIndispensable = serializedObject.FindProperty("indispensable");
             propertyIndexAd = serializedObject.FindProperty("indexAd");
         }
 
@@ -38,8 +38,8 @@ namespace KPlugin.AdMax.Editor
         {
             serializedObject.Update();
             //
-            EditorGUILayout.PropertyField(propertySetInstance, new GUIContent("Set Instance"));
             EditorGUILayout.PropertyField(propertyInitIndispensable, new GUIContent("Init Indispensable"));
+            EditorGUILayout.PropertyField(propertySetInstance, new GUIContent("Set Instance"));
             EditorGUILayout.PropertyField(propertyAdName, new GUIContent("Ad Name"));
             if (string.IsNullOrEmpty(propertyAdName.stringValue))
             {

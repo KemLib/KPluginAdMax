@@ -10,8 +10,8 @@ namespace KPlugin.AdMax.Editor
         #region Properties
         private SerializedProperty propertyAdName,
             propertyIsAutoReload,
-            propertySetInstance,
             propertyInitIndispensable,
+            propertySetInstance,
             propertyIndexAd;
         #endregion
 
@@ -20,8 +20,8 @@ namespace KPlugin.AdMax.Editor
         {
             propertyAdName = serializedObject.FindProperty("adName");
             propertyIsAutoReload = serializedObject.FindProperty("isAutoReload");
+            propertyInitIndispensable = serializedObject.FindProperty("initIndispensable");
             propertySetInstance = serializedObject.FindProperty("setInstance");
-            propertyInitIndispensable = serializedObject.FindProperty("indispensable");
             propertyIndexAd = serializedObject.FindProperty("indexAd");
         }
 
@@ -29,8 +29,8 @@ namespace KPlugin.AdMax.Editor
         {
             serializedObject.Update();
             //
-            EditorGUILayout.PropertyField(propertySetInstance, new GUIContent("Set Instance"));
             EditorGUILayout.PropertyField(propertyInitIndispensable, new GUIContent("Init Indispensable"));
+            EditorGUILayout.PropertyField(propertySetInstance, new GUIContent("Set Instance"));
             EditorGUILayout.PropertyField(propertyAdName, new GUIContent("Ad Name"));
             if (string.IsNullOrEmpty(propertyAdName.stringValue))
             {

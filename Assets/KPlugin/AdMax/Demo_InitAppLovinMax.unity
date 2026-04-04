@@ -209,7 +209,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adName: KPlugin_AppLovinMax_AppOpen
   isAutoReload: 0
-  indispensable: 0
+  initIndispensable: 0
   setInstance: 0
   indexAd: 0
 --- !u!1 &200487108
@@ -257,13 +257,13 @@ MonoBehaviour:
     gameobjects:
     - {fileID: 367219531}
     - {fileID: 1957636960}
+  onBegin:
+    m_PersistentCalls:
+      m_Calls: []
   onStep:
     m_PersistentCalls:
       m_Calls: []
   onProgress:
-    m_PersistentCalls:
-      m_Calls: []
-  onBegin:
     m_PersistentCalls:
       m_Calls: []
   onEnd:
@@ -330,7 +330,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adName: KPlugin_AppLovinMax_Interstitial
   isAutoReload: 0
-  indispensable: 0
+  initIndispensable: 0
   setInstance: 0
   indexAd: 0
 --- !u!1 &720416494
@@ -379,11 +379,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adName: KPlugin_AppLovinMax_Banner
   isAutoReload: 1
-  adPosition: 0
+  adPosition: 8
   adSize: 1
   position: {x: 0, y: 0}
   size: {x: 0, y: 0}
-  indispensable: 0
+  initIndispensable: 0
   setInstance: 0
   indexAd: 0
   customBackgroundColor: 0
@@ -434,11 +434,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adName: KPlugin_AppLovinMax_MRec
   isAutoReload: 1
-  adPosition: 0
+  adPosition: 8
   adSize: 1
   position: {x: 0, y: 0}
   size: {x: 0, y: 0}
-  indispensable: 0
+  initIndispensable: 0
   setInstance: 0
   indexAd: 0
 --- !u!1 &1225450634
@@ -583,12 +583,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initIndispensable: 0
-  showDebuggerAfterInit: 0
-  adAppOpens: []
-  adBanners: []
-  adMRecs: []
-  adInterstitials: []
-  adRewardeds: []
+  adAppOpens:
+  - {fileID: 167550066}
+  adBanners:
+  - {fileID: 720416496}
+  adMRecs:
+  - {fileID: 806238743}
+  adInterstitials:
+  - {fileID: 367219533}
+  adRewardeds:
+  - {fileID: 1957636962}
 --- !u!1 &1957636960
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,7 +639,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adName: KPlugin_AppLovinMax_Rewarded
   isAutoReload: 0
-  indispensable: 0
+  initIndispensable: 0
   setInstance: 0
   indexAd: 0
 --- !u!1001 &2052286903

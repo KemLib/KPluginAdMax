@@ -1,7 +1,8 @@
 ﻿using KTool.Attribute;
+using KTool.Cron;
 using KTool.Init;
-using System.Collections;
 using UnityEngine;
+using static MaxSdkBase;
 
 namespace KPlugin.AdMax
 {
@@ -89,6 +90,10 @@ namespace KPlugin.AdMax
         #endregion
 
         #region Methods
+        public static bool IsReady()
+        {
+            return IsInit;
+        }
         public void ShowMediationDebugger()
         {
 #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_IOS)
@@ -111,28 +116,28 @@ namespace KPlugin.AdMax
             MaxSdk.InitializeSdk();
             return initTrackingSource;
         }
-        private void Max_OnSdkInitializedEvent(MaxSdkBase.SdkConfiguration sdkConfiguration)
+        private void Max_OnSdkInitializedEvent(SdkConfiguration sdkConfiguration)
         {
             if (MaxSdk.IsInitialized())
-                StartCoroutine(IE_Max_InitComplete());
+            {
+                isIniting = false;
+                IsInit = true;
+                CountryCode = MaxSdk.GetSdkConfiguration().CountryCode;
+                //
+                initTrackingSource.CompleteSuccess();
+                initTrackingSource = null;
+            }
             else
-                StartCoroutine(IE_Max_RetryInit());
+            {
+                CronObject.Create()
+                    .Add(ConditionFrame.Create(1))
+                    .Add(CallbackAction.Create(Max_Init_Retry))
+                    .Run();
+            }
         }
-        private IEnumerator IE_Max_RetryInit()
+        private void Max_Init_Retry()
         {
-            yield return new WaitForEndOfFrame();
             MaxSdk.InitializeSdk();
-        }
-        private IEnumerator IE_Max_InitComplete()
-        {
-            yield return new WaitForEndOfFrame();
-            //
-            isIniting = false;
-            IsInit = true;
-            CountryCode = MaxSdk.GetSdkConfiguration().CountryCode;
-            //
-            initTrackingSource.CompleteSuccess();
-            initTrackingSource = null;
         }
         #endregion
 

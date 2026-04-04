@@ -14,16 +14,12 @@ namespace KPlugin.AppLovinMax
         {
             get
             {
-#if UNITY_EDITOR
-                if (!string.IsNullOrEmpty(androidId))
-                    return androidId;
-                if (!string.IsNullOrEmpty(iosId))
-                    return iosId;
-                return string.Empty;
-#elif UNITY_ANDROID
+#if UNITY_ANDROID
                 return androidId;
 #elif UNITY_IOS
                 return iosId;
+#else
+                return string.Empty;
 #endif
             }
         }

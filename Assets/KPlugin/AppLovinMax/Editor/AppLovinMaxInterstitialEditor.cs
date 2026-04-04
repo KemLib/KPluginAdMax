@@ -21,7 +21,7 @@ namespace KPlugin.AppLovinMax.Editor
             propertyAdName = serializedObject.FindProperty("adName");
             propertyIsAutoReload = serializedObject.FindProperty("isAutoReload");
             propertySetInstance = serializedObject.FindProperty("setInstance");
-            propertyInitIndispensable = serializedObject.FindProperty("initIndispensable");
+            propertyInitIndispensable = serializedObject.FindProperty("indispensable");
             propertyIndexAd = serializedObject.FindProperty("indexAd");
         }
 

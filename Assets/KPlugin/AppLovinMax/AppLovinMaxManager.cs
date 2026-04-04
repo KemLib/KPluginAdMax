@@ -16,6 +16,11 @@ namespace KPlugin.AppLovinMax
             get;
             private set;
         }
+        public static bool IsInit
+        {
+            get;
+            private set;
+        }
         public static string CountryCode
         {
             get;
@@ -27,6 +32,10 @@ namespace KPlugin.AppLovinMax
             set => MaxSdk.SetMuted(value);
         }
 
+        [SerializeField]
+        private bool indispensable;
+        [SerializeField]
+        private bool showDebuggerAfterInit;
         [SerializeField, GetComponent(GetComponentType.InGameObject_AllChildren, true)]
         private AppLovinMaxAppOpen[] adAppOpens;
         [SerializeField, GetComponent(GetComponentType.InGameObject_AllChildren, true)]
@@ -38,15 +47,23 @@ namespace KPlugin.AppLovinMax
         [SerializeField, GetComponent(GetComponentType.InGameObject_AllChildren, true)]
         private AppLovinMaxRewarded[] adRewardeds;
 
-        private bool isInit;
         private InitTrackingSource initTrackingSource;
 
-        public bool IsInit => isInit;
         private bool IsIniting => initTrackingSource != null;
         #endregion
 
         #region Unity Event
-
+        private void OnDestroy()
+        {
+            if (Instance != null && Instance.GetInstanceID() == GetInstanceID())
+            {
+                Instance = null;
+            }
+        }
+        private void OnApplicationQuit()
+        {
+            IsInit = false;
+        }
         #endregion
 
         #region Init
@@ -56,6 +73,7 @@ namespace KPlugin.AppLovinMax
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
+                //
                 return Max_Init();
             }
             //
@@ -83,7 +101,7 @@ namespace KPlugin.AppLovinMax
             if (IsInit || IsIniting)
                 return IInitTracking.Success;
             //
-            initTrackingSource = new InitTrackingSource(true);
+            initTrackingSource = new InitTrackingSource(indispensable);
             if (!string.IsNullOrEmpty(AppLovinMaxSetting.Instance.UserId))
                 MaxSdk.SetUserId(AppLovinMaxSetting.Instance.UserId);
             MaxSdkCallbacks.OnSdkInitializedEvent += Max_OnSdkInitializedEvent;
@@ -93,25 +111,30 @@ namespace KPlugin.AppLovinMax
         private void Max_OnSdkInitializedEvent(MaxSdkBase.SdkConfiguration sdkConfiguration)
         {
             if (MaxSdk.IsInitialized())
-            {
-                isInit = true;
-                initTrackingSource.CompleteSuccess();
-                initTrackingSource = null;
-                //
-                CountryCode = MaxSdk.GetSdkConfiguration().CountryCode;
-            }
+                StartCoroutine(IE_Max_InitComplete());
             else
-            {
-                StartCoroutine(IE_MaxInit());
-            }
+                StartCoroutine(IE_Max_RetryInit());
         }
-        private IEnumerator IE_MaxInit()
+        private IEnumerator IE_Max_RetryInit()
         {
             yield return new WaitForEndOfFrame();
             MaxSdk.InitializeSdk();
         }
+        private IEnumerator IE_Max_InitComplete()
+        {
+            yield return new WaitForEndOfFrame();
+            //
+            IsInit = true;
+            CountryCode = MaxSdk.GetSdkConfiguration().CountryCode;
+            if (showDebuggerAfterInit)
+                ShowDebugger();
+            //
+            initTrackingSource.CompleteSuccess();
+            initTrackingSource = null;
+        }
         #endregion
 
+        #region Ad
         #region AppOpen
         public int AppOpen_Count()
         {
@@ -210,6 +233,7 @@ namespace KPlugin.AppLovinMax
                     return ad;
             return null;
         }
+        #endregion
         #endregion
     }
 }

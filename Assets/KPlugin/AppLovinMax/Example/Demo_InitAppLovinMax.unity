@@ -148,66 +148,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11fe5fbd15868e241b5e4570bd4db2a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onInit:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1344449214}
-        m_TargetAssemblyTypeName: KTool.AppLovinMax.Example.LoadUi, Assembly-CSharp
-        m_MethodName: Show
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onComplete:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1344449214}
-        m_TargetAssemblyTypeName: KTool.AppLovinMax.Example.LoadUi, Assembly-CSharp
-        m_MethodName: Hide
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onProgress:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1344449214}
-        m_TargetAssemblyTypeName: KTool.AppLovinMax.Example.LoadUi, Assembly-CSharp
-        m_MethodName: set_Progress
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onTaskName:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1344449214}
-        m_TargetAssemblyTypeName: KTool.AppLovinMax.Example.LoadUi, Assembly-CSharp
-        m_MethodName: set_TaskName
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!4 &67453446
 Transform:
   m_ObjectHideFlags: 0
@@ -269,7 +209,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adName: KPlugin_AppLovinMax_AppOpen
   isAutoReload: 1
-  initIndispensable: 0
+  indispensable: 0
   setInstance: 1
   indexAd: 0
 --- !u!1 &200487108
@@ -317,9 +257,12 @@ MonoBehaviour:
     gameobjects:
     - {fileID: 367219531}
     - {fileID: 1957636960}
-  afterInit: 1
-  nextScene: Demo_AppLovinMax
-  loadSceneMode: 0
+  onStep:
+    m_PersistentCalls:
+      m_Calls: []
+  onProgress:
+    m_PersistentCalls:
+      m_Calls: []
   onBegin:
     m_PersistentCalls:
       m_Calls: []
@@ -387,7 +330,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adName: KPlugin_AppLovinMax_Interstitial
   isAutoReload: 1
-  initIndispensable: 0
+  indispensable: 0
   setInstance: 1
   indexAd: 0
 --- !u!1 &720416494
@@ -440,7 +383,7 @@ MonoBehaviour:
   adSize: 1
   position: {x: 0, y: 0}
   size: {x: 0, y: 0}
-  initIndispensable: 0
+  indispensable: 0
   setInstance: 1
   indexAd: 0
   customBackgroundColor: 0
@@ -480,7 +423,7 @@ MonoBehaviour:
   adSize: 1
   position: {x: 0, y: 0}
   size: {x: 0, y: 0}
-  initIndispensable: 0
+  indispensable: 0
   setInstance: 0
   indexAd: 0
 --- !u!4 &806238742
@@ -619,6 +562,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41d8d10404a6b434e84b638ac9a4881f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  indispensable: 0
+  showDebuggerAfterInit: 0
   adAppOpens:
   - {fileID: 167550066}
   adBanners:
@@ -706,17 +651,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2f2cbe191e597ea458c2b6cb9a3c55b2, type: 3}
---- !u!114 &1344449214 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 487835215276360773, guid: 2f2cbe191e597ea458c2b6cb9a3c55b2, type: 3}
-  m_PrefabInstance: {fileID: 1344449213}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf409b20bdd09a14db81a2b796928e13, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1957636960
 GameObject:
   m_ObjectHideFlags: 0
@@ -763,7 +697,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adName: KPlugin_AppLovinMax_Rewarded
   isAutoReload: 1
-  initIndispensable: 0
+  indispensable: 0
   setInstance: 1
   indexAd: 0
 --- !u!1660057539 &9223372036854775807

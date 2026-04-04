@@ -14,7 +14,7 @@ namespace KPlugin.AppLovinMax
             ERROR_IS_DESTROY = "Ad is destroy";
 
         [SerializeField]
-        private bool initIndispensable;
+        private bool indispensable;
         [SerializeField]
         private bool setInstance;
         [SerializeField, SelectAdId(AppLovinMaxAdType.MRec)]
@@ -95,7 +95,7 @@ namespace KPlugin.AppLovinMax
             if (IsDestroy || IsInited || initTrackingSource != null)
                 return IInitTracking.Fail;
             //
-            initTrackingSource = new InitTrackingSource(initIndispensable);
+            initTrackingSource = new InitTrackingSource(indispensable);
             OnAdInited += Init_OnAdInited;
             Init();
             return initTrackingSource;
@@ -212,7 +212,7 @@ namespace KPlugin.AppLovinMax
         #region Ad
         private IEnumerator Ad_Create()
         {
-            while (!AppLovinMaxManager.Instance.IsInit)
+            while (!AppLovinMaxManager.IsInit)
                 yield return new WaitForEndOfFrame();
             //
             if (IsDestroy)
@@ -255,6 +255,9 @@ namespace KPlugin.AppLovinMax
             if (attemptLoad > 0)
                 yield return new WaitForSecondsRealtime(attemptLoad * 2);
             else
+                yield return new WaitForEndOfFrame();
+            //
+            while (!AppLovinMaxManager.IsInit)
                 yield return new WaitForEndOfFrame();
             //
             if (IsDestroy)
@@ -376,13 +379,14 @@ namespace KPlugin.AppLovinMax
                 return;
             //
             AdRevenuePaid revenuePaid = new AdRevenuePaid(
-                AppLovinMaxManager.MAX_SCOURCE,
-                adInfo.NetworkName,
-                AdId,
-                AppLovinMaxManager.CountryCode,
-                AdType,
-                adInfo.Revenue,
-                AppLovinMaxManager.MAX_CURRENCY);
+                source: AppLovinMaxManager.MAX_SCOURCE,
+                network_name: adInfo.NetworkName,
+                idAd: AdId,
+                adType: AdType,
+                countryCode: AppLovinMaxManager.CountryCode,
+                placement: adInfo.Placement,
+                value: adInfo.Revenue,
+                currency: AppLovinMaxManager.MAX_CURRENCY);
             //
             PushEvent_RevenuePaid(revenuePaid);
             adTrackingSource.PushEvent_RevenuePaid(revenuePaid);

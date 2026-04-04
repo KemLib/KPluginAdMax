@@ -32,7 +32,7 @@ namespace KPlugin.AppLovinMax.Editor
             propertyPosition = serializedObject.FindProperty("position");
             propertySize = serializedObject.FindProperty("size");
             propertySetInstance = serializedObject.FindProperty("setInstance");
-            propertyInitIndispensable = serializedObject.FindProperty("initIndispensable");
+            propertyInitIndispensable = serializedObject.FindProperty("indispensable");
             propertyIndexAd = serializedObject.FindProperty("indexAd");
             propertyCustomBackgroundColor = serializedObject.FindProperty("customBackgroundColor");
             propertybackgroundColor = serializedObject.FindProperty("backgroundColor");

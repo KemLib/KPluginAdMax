@@ -21,7 +21,7 @@ namespace KPlugin.AppLovinMax.Editor
             propertyAdName = serializedObject.FindProperty("adName");
             propertyIsAutoReload = serializedObject.FindProperty("isAutoReload");
             propertySetInstance = serializedObject.FindProperty("setInstance");
-            propertyInitIndispensable = serializedObject.FindProperty("initIndispensable");
+            propertyInitIndispensable = serializedObject.FindProperty("indispensable");
             propertyIndexAd = serializedObject.FindProperty("indexAd");
         }
 
@@ -30,7 +30,7 @@ namespace KPlugin.AppLovinMax.Editor
             serializedObject.Update();
             //
             EditorGUILayout.PropertyField(propertySetInstance, new GUIContent("Set Instance"));
-            EditorGUILayout.PropertyField(propertyInitIndispensable, new GUIContent("Init Indispensable"));
+            EditorGUILayout.PropertyField(propertyInitIndispensable, new GUIContent("Indispensable"));
             EditorGUILayout.PropertyField(propertyAdName, new GUIContent("Ad Name"));
             if (string.IsNullOrEmpty(propertyAdName.stringValue))
             {

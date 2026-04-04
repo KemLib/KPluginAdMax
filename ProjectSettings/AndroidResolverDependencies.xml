@@ -1,6 +1,6 @@
 <dependencies>
   <packages>
-    <package>com.applovin:applovin-sdk:13.3.1</package>
+    <package>com.applovin:applovin-sdk:13.6.2</package>
   </packages>
   <files />
   <settings>

@@ -1,0 +1,17 @@
+{
+    "name": "KPluginAdMaxMediation",
+    "rootNamespace": "",
+    "references": [
+        "GUID:47b1bdd8bf9052b40b56c65b51bfea0d",
+        "GUID:a4cfc1a18fa3a469b96d885db522f42e"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

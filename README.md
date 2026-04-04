@@ -1,1 +1,1 @@
-# KPluginAppLovinMAX
+# KPlugin AdMax

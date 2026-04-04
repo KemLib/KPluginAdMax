@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.applovin.mediation.ads": {
-      "version": "8.6.1",
+      "version": "8.6.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -15,6 +15,12 @@
       "source": "registry",
       "dependencies": {},
       "url": "https://package.openupm.com"
+    },
+    "com.kem.kplugin.admax": {
+      "version": "file:KPluginAdMax",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.kem.ktool": {
       "version": "https://github.com/KemLib/KTool.git?path=/Packages/KTool#develop",

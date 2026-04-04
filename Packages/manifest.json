@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.applovin.mediation.ads": "8.6.1",
+    "com.applovin.mediation.ads": "8.6.2",
     "com.kem.ktool": "https://github.com/KemLib/KTool.git?path=/Packages/KTool#develop",
     "com.unity.collab-proxy": "2.11.3",
     "com.unity.feature.2d": "2.0.1",

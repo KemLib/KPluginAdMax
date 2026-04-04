@@ -1,4 +1,0 @@
-KPluginAppLovinMax version 1.0.0
-KTool version 1.0.5
-AppLovinMax version 8.3.1
-ExternalDependencyManager version 1.2.186

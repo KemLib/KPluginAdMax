@@ -1,0 +1,21 @@
+{
+  "name": "com.kem.kplugin.admax",
+  "version": "1.0.0",
+  "displayName": "KPluginAdMax",
+  "description": "KPlugin Ad Max Mediation",
+  "documentationUrl": "https://github.com/KemLib/KPluginAdMaxMediation/blob/main/README.md",
+  "changelogUrl": "https://github.com/KemLib/KPluginAdMaxMediation/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/KemLib/KPluginAdMaxMediation/blob/main/LICENSE.md",
+  "keywords": [
+    "InfinityWorld",
+    "KPlugin",
+    "Tool",
+    "Ad",
+    "MaxMediation"
+  ],
+  "author": {
+    "name": "Nguyen Van Hung",
+    "email": "nvhung.world@google.com",
+    "url": "https://www.facebook.com/Hung.FollowMe"
+  }
+}

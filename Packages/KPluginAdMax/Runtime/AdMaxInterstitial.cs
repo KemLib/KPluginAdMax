@@ -207,15 +207,15 @@ namespace KPlugin.AdMax
             if (adId != AdId)
                 return;
             isLoading = false;
+            attemptLoad = Mathf.Min(attemptLoad + 1, 6);
             //
             if (errorInfo != null)
                 Debug.LogError(string.Format(ERROR_LOAD_FAIL, errorInfo.Code));
             //
-            attemptLoad = Mathf.Min(attemptLoad + 1, 6);
-            PushEvent_Loaded(false);
-            //
             if (!IsDestroy && IsAutoReload)
                 Ad_Create();
+            //
+            PushEvent_Loaded(false);
         }
         private void Ad_OnAdDisplayedEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {
@@ -230,13 +230,12 @@ namespace KPlugin.AdMax
             if (adId != AdId)
                 return;
             IsShow = false;
+            Ad_Hide();
             //
             if (errorInfo != null)
                 Debug.LogError(string.Format(ERROR_DISPLAY_FAIL, errorInfo.Code));
             PushEvent_Displayed(false);
             adTrackingSource.PushEvent_Displayed(false);
-            //
-            Ad_Hide();
         }
         private void Ad_OnAdClickedEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {
@@ -251,11 +250,10 @@ namespace KPlugin.AdMax
             if (adId != AdId)
                 return;
             IsShow = false;
+            Ad_Hide();
             //
             PushEvent_Hidden();
             adTrackingSource.PushEvent_Hidden();
-            //
-            Ad_Hide();
         }
         private void Ad_Hide()
         {

@@ -1,5 +1,5 @@
 ﻿<Solution>
-  <Project Path="KPluginAdMaxMediation.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="KPluginAdMaxMediation.csproj" />
   <Project Path="KPluginAdMaxMediationEditor.csproj" />
 </Solution>

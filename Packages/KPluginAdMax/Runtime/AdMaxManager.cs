@@ -17,31 +17,10 @@ namespace KPlugin.AdMax
             get;
             private set;
         }
-        public static bool IsInit
-        {
-            get => Instance != null && Instance.isInit;
-            private set
-            {
-                if (Instance == null)
-                    return;
-                Instance.isInit = value;
-            }
-        }
         public static string CountryCode
         {
             get;
             private set;
-        }
-
-        public static bool Mute
-        {
-            get => IsInit && MaxSdk.IsMuted();
-            set
-            {
-                if (!IsInit)
-                    return;
-                MaxSdk.SetMuted(value);
-            }
         }
 
         [SerializeField]
@@ -60,6 +39,17 @@ namespace KPlugin.AdMax
         private bool isInit,
             isIniting;
         private InitTrackingSource initTrackingSource;
+
+        public bool Mute
+        {
+            get => isInit && MaxSdk.IsMuted();
+            set
+            {
+                if (!isInit)
+                    return;
+                MaxSdk.SetMuted(value);
+            }
+        }
         #endregion
 
         #region Unity Event
@@ -92,7 +82,7 @@ namespace KPlugin.AdMax
         #region Methods
         public static bool IsReady()
         {
-            return IsInit;
+            return Instance != null && Instance.isInit;
         }
         public void ShowMediationDebugger()
         {
@@ -105,7 +95,7 @@ namespace KPlugin.AdMax
         #region Max Init
         private IInitTracking Max_Init()
         {
-            if (IsInit || isIniting)
+            if (isInit || isIniting)
                 return IInitTracking.Success;
             isIniting = true;
             //
@@ -121,7 +111,7 @@ namespace KPlugin.AdMax
             if (MaxSdk.IsInitialized())
             {
                 isIniting = false;
-                IsInit = true;
+                isInit = true;
                 CountryCode = MaxSdk.GetSdkConfiguration().CountryCode;
                 //
                 initTrackingSource.CompleteSuccess();

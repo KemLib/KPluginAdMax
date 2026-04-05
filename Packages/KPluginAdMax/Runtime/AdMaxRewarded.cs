@@ -174,7 +174,7 @@ namespace KPlugin.AdMax
         #region Ad
         private void Ad_Create()
         {
-            if (IsLoaded || isLoading)
+            if (IsDestroy || IsLoaded || isLoading)
                 return;
             isLoading = true;
             //
@@ -192,32 +192,44 @@ namespace KPlugin.AdMax
                 isLoading = false;
                 return;
             }
-            MaxSdk.LoadAppOpenAd(AdId);
+            MaxSdk.LoadRewardedAd(AdId);
         }
         private void Ad_OnAdLoadedEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {
             if (adId != AdId)
                 return;
             isLoading = false;
-            IsLoaded = true;
-            attemptLoad = 0;
-            //
-            PushEvent_Loaded(true);
+            if (IsDestroy)
+            {
+                return;
+            }
+            else
+            {
+                IsLoaded = true;
+                attemptLoad = 0;
+                //
+                PushEvent_Loaded(true);
+            }
         }
         private void Ad_OnAdLoadFailedEvent(string adId, MaxSdkBase.ErrorInfo errorInfo)
         {
             if (adId != AdId)
                 return;
             isLoading = false;
-            attemptLoad = Mathf.Min(attemptLoad + 1, 6);
-            //
-            if (errorInfo != null)
-                Debug.LogError(string.Format(ERROR_LOAD_FAIL, errorInfo.Code));
-            //
-            if (!IsDestroy && IsAutoReload)
-                Ad_Create();
-            //
-            PushEvent_Loaded(false);
+            if (IsDestroy)
+            {
+                return;
+            }
+            else
+            {
+                attemptLoad = Mathf.Min(attemptLoad + 1, 6);
+                if (errorInfo != null)
+                    Debug.LogError(string.Format(ERROR_LOAD_FAIL, errorInfo.Code));
+                PushEvent_Loaded(false);
+                //
+                if (IsAutoReload)
+                    Ad_Create();
+            }
         }
         private void Ad_OnAdDisplayedEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {
@@ -232,12 +244,22 @@ namespace KPlugin.AdMax
             if (adId != AdId)
                 return;
             IsShow = false;
-            Ad_Hide();
-            //
-            if (errorInfo != null)
-                Debug.LogError(string.Format(ERROR_DISPLAY_FAIL, errorInfo.Code));
-            PushEvent_Displayed(false);
-            adTrackingSource.PushEvent_Displayed(false);
+            IsLoaded = false;
+            if (IsDestroy)
+            {
+                Ad_EventUnRegister();
+                PushEvent_Destroy();
+            }
+            else
+            {
+                if (errorInfo != null)
+                    Debug.LogError(string.Format(ERROR_DISPLAY_FAIL, errorInfo.Code));
+                PushEvent_Displayed(false);
+                adTrackingSource.PushEvent_Displayed(false);
+                //
+                if (IsAutoReload)
+                    Ad_Create();
+            }
         }
         private void Ad_OnAdClickedEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {
@@ -252,23 +274,19 @@ namespace KPlugin.AdMax
             if (adId != AdId)
                 return;
             IsShow = false;
-            Ad_Hide();
-            //
-            PushEvent_Hidden();
-            adTrackingSource.PushEvent_Hidden();
-        }
-        private void Ad_Hide()
-        {
             IsLoaded = false;
-            //
             if (IsDestroy)
             {
                 Ad_EventUnRegister();
                 PushEvent_Destroy();
             }
-            else if (IsAutoReload)
+            else
             {
-                Ad_Create();
+                PushEvent_Hidden();
+                adTrackingSource.PushEvent_Hidden();
+                //
+                if(IsAutoReload)
+                    Ad_Create();
             }
         }
         private void Ad_OnAdRevenuePaidEvent(string adId, MaxSdkBase.AdInfo adInfo)

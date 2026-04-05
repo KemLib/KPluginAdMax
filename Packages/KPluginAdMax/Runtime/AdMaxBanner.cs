@@ -319,6 +319,9 @@ namespace KPlugin.AdMax
             if (adId != AdId)
                 return;
             isLoading = false;
+            if (IsDestroy)
+                return;
+            //
             IsLoaded = true;
             attemptLoad = 0;
             //
@@ -333,8 +336,10 @@ namespace KPlugin.AdMax
             if (adId != AdId)
                 return;
             isLoading = false;
-            attemptLoad = Mathf.Min(attemptLoad + 1, 6);
+            if (IsDestroy)
+                return;
             //
+            attemptLoad = Mathf.Min(attemptLoad + 1, 6);
             if (errorInfo != null)
                 Debug.LogError(string.Format(ERROR_LOAD_FAIL, errorInfo.Code));
             //

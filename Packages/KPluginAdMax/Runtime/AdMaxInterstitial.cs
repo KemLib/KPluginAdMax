@@ -112,8 +112,7 @@ namespace KPlugin.AdMax
             {
                 if (!IsShow)
                 {
-                    Ad_EventUnRegister();
-                    PushEvent_Destroy();
+                    Ad_Destroy();
                 }
             }
             else
@@ -173,6 +172,11 @@ namespace KPlugin.AdMax
         #endregion
 
         #region Ad
+        private void Ad_Destroy()
+        {
+            Ad_EventUnRegister();
+            PushEvent_Destroy();
+        }
         private void Ad_Create()
         {
             if (IsDestroy || IsLoaded || isLoading)
@@ -198,9 +202,11 @@ namespace KPlugin.AdMax
             if (IsDestroy)
             {
                 isLoading = false;
-                return;
             }
-            MaxSdk.LoadInterstitial(AdId);
+            else
+            {
+                MaxSdk.LoadInterstitial(AdId);
+            }
         }
         private void Ad_OnAdLoadedEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {
@@ -213,7 +219,6 @@ namespace KPlugin.AdMax
             //
             IsLoaded = true;
             attemptLoad = 0;
-            //
             PushEvent_Loaded(true);
         }
         private void Ad_OnAdLoadFailedEvent(string adId, MaxSdkBase.ErrorInfo errorInfo)
@@ -247,19 +252,19 @@ namespace KPlugin.AdMax
             //
             IsShow = false;
             IsLoaded = false;
-            if (IsDestroy)
-            {
-                Ad_EventUnRegister();
-                PushEvent_Destroy();
-                return;
-            }
-            //
             if (errorInfo != null)
                 Debug.LogError(string.Format(ERROR_DISPLAY_FAIL, errorInfo.Code));
             PushEvent_Displayed(false);
             //
-            if (IsAutoReload)
-                Ad_Create();
+            if (IsDestroy)
+            {
+                Ad_Destroy();
+            }
+            else
+            {
+                if (IsAutoReload)
+                    Ad_Create();
+            }
         }
         private void Ad_OnAdClickedEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {
@@ -275,17 +280,17 @@ namespace KPlugin.AdMax
             //
             IsShow = false;
             IsLoaded = false;
-            if (IsDestroy)
-            {
-                Ad_EventUnRegister();
-                PushEvent_Destroy();
-                return;
-            }
-            //
             PushEvent_Hidden();
             //
-            if (IsAutoReload)
-                Ad_Create();
+            if (IsDestroy)
+            {
+                Ad_Destroy();
+            }
+            else
+            {
+                if (IsAutoReload)
+                    Ad_Create();
+            }
         }
         private void Ad_OnAdRevenuePaidEvent(string adId, MaxSdkBase.AdInfo adInfo)
         {

@@ -183,8 +183,8 @@ namespace KPlugin.AdMax
             //
             MaxSdk.HideMRec(AdId);
             IsShow = false;
-            //
             PushEvent_Hidden();
+            //
             return true;
         }
         #endregion
@@ -213,6 +213,27 @@ namespace KPlugin.AdMax
         #endregion
 
         #region Ad
+        private void Ad_Destroy()
+        {
+            if (!isCreated)
+                return;
+            //
+            if (IsLoaded)
+            {
+                if (IsShow)
+                {
+                    MaxSdk.HideMRec(AdId);
+                    IsShow = false;
+                    //
+                    PushEvent_Hidden();
+                }
+                IsLoaded = false;
+            }
+            //
+            Ad_EventUnRegister();
+            MaxSdk.DestroyMRec(AdId);
+            isCreated = false;
+        }
         private void Ad_Create_Begin()
         {
             if (isCreated || isCreating)
@@ -261,27 +282,6 @@ namespace KPlugin.AdMax
             if (!IsAutoReload)
                 Ad_Load_Begin();
         }
-        private void Ad_Destroy()
-        {
-            if (!isCreated)
-                return;
-            //
-            if (IsLoaded)
-            {
-                if (IsShow)
-                {
-                    MaxSdk.HideMRec(AdId);
-                    IsShow = false;
-                    //
-                    PushEvent_Hidden();
-                }
-                IsLoaded = false;
-            }
-            //
-            Ad_EventUnRegister();
-            MaxSdk.DestroyMRec(AdId);
-            isCreated = false;
-        }
         private void Ad_Load_Begin()
         {
             if (!isCreated || IsLoaded || isLoading)
@@ -306,10 +306,11 @@ namespace KPlugin.AdMax
             if (IsDestroy)
             {
                 isLoading = false;
-                return;
             }
-            //
-            MaxSdk.LoadMRec(AdId);
+            else
+            {
+                MaxSdk.LoadMRec(AdId);
+            }
         }
         private void Ad_OnAdLoadedEvent(string adId, AdInfo adInfo)
         {
@@ -322,7 +323,6 @@ namespace KPlugin.AdMax
             //
             IsLoaded = true;
             attemptLoad = 0;
-            //
             PushEvent_Loaded(true);
         }
         private void Ad_OnAdLoadFailedEvent(string adId, ErrorInfo errorInfo)
@@ -337,7 +337,6 @@ namespace KPlugin.AdMax
             attemptLoad = Mathf.Min(attemptLoad + 1, 6);
             if (errorInfo != null)
                 Debug.LogError(string.Format(ERROR_LOAD_FAIL, errorInfo.Code));
-            //
             PushEvent_Loaded(false);
             //
             if (!IsAutoReload)

@@ -1,8 +1,6 @@
-﻿using KTool;
-using KTool.Advertisement;
+﻿using KTool.Advertisement;
 using KTool.Cron;
 using KTool.Init;
-using System.Collections;
 using UnityEngine;
 using static MaxSdkBase;
 
@@ -11,8 +9,9 @@ namespace KPlugin.AdMax
     public class AdMaxMRec : AdBanner, IIniter
     {
         #region Properties
-        private const string ERROR_LOAD_FAIL = "Ad load fail code: {0}",
-            ERROR_IS_DESTROY = "Ad is destroy";
+        private const string ERROR_LOAD_FAIL = "Ad MRec load fail code: {0}",
+            ERROR_SHOW_FAIL_AD_NOT_READY = "Ad MRec show fail: ad not ready",
+            ERROR_SHOW_FAIL_AD_IS_SHOWED = "Ad MRec show fail: ad is show";
 
         [SerializeField]
         private bool initIndispensable;
@@ -21,11 +20,12 @@ namespace KPlugin.AdMax
         [SerializeField, SelectAdId(AdMaxAdType.MRec)]
         private int indexAd = 0;
 
-        private bool isLoading;
+        private bool isInit,
+            isCreating,
+            isCreated,
+            isLoading;
         private int attemptLoad;
-        private bool isCreateAdObject;
         private InitTrackingSource initTrackingSource;
-        private AdBannerTrackingSource adTrackingSource;
 
         public string AdId
         {
@@ -45,7 +45,7 @@ namespace KPlugin.AdMax
                 if (value == base.IsAutoReload)
                     return;
                 base.IsAutoReload = value;
-                if (IsReady)
+                if (isCreated)
                 {
                     if (IsAutoReload)
                         MaxSdk.StartMRecAutoRefresh(AdId);
@@ -63,7 +63,7 @@ namespace KPlugin.AdMax
                     return;
                 //
                 base.PositionType = value;
-                if (IsInited)
+                if (isCreated)
                 {
                     MaxSdk.UpdateMRecPosition(AdId, Utility.ConvertPosition(PositionType));
                 }
@@ -78,7 +78,7 @@ namespace KPlugin.AdMax
                     return;
                 //
                 base.Position = value;
-                if (PositionType == AdPosition.Custom && IsInited)
+                if (isCreated && PositionType == AdPosition.Custom)
                 {
                     Vector2 maxPosition = Utility.Convert_UnityToMax(Position);
                     MaxSdk.UpdateMRecPosition(AdId, maxPosition.x, maxPosition.y);
@@ -99,7 +99,7 @@ namespace KPlugin.AdMax
         #region Init
         public IInitTracking InitBegin()
         {
-            if (IsDestroy || IsInited || initTrackingSource != null)
+            if (IsDestroy || isInit || initTrackingSource != null)
                 return IInitTracking.Fail;
             //
             initTrackingSource = new InitTrackingSource(initIndispensable);
@@ -111,7 +111,7 @@ namespace KPlugin.AdMax
         {
 
         }
-        private void Init_OnLoaded(Ad source, bool isSuccess)
+        private void Init_OnLoaded(AdBase source, bool isSuccess)
         {
             OnAdLoaded -= Init_OnLoaded;
             if (isSuccess)
@@ -123,77 +123,69 @@ namespace KPlugin.AdMax
         #endregion
 
         #region Methods
-        public override void Init()
-        {
-            if (IsDestroy || IsInited)
-                return;
-            IsInited = true;
-            //
-            if (setInstance)
-                instance = this;
-            PushEvent_Inited(true);
-        }
         public override void Load()
         {
             if (IsDestroy)
                 return;
-            Init();
             //
-            if (isCreateAdObject)
+            if (!isInit)
+            {
+                isInit = true;
+                //
+                if (setInstance)
+                    instance = this;
+            }
+            //
+            if (isCreated)
             {
                 if (!IsAutoReload)
-                    MaxSdk.LoadBanner(AdId);
+                    Ad_Load_Begin();
             }
             else
             {
-                Ad_Create();
+                Ad_Create_Begin();
             }
         }
         public override void Destroy()
         {
             if (IsDestroy)
                 return;
+            //
             IsDestroy = true;
             Ad_Destroy();
             PushEvent_Destroy();
         }
-        public override IAdBannerTracking Show()
+        protected override bool OnShow(out string error)
         {
-            if (IsDestroy)
-                return new AdBannerTrackingSource(this, ERROR_IS_DESTROY);
+            if (IsShow)
+            {
+                error = ERROR_SHOW_FAIL_AD_IS_SHOWED;
+                return false;
+            }
+            if (!IsReady)
+            {
+                error = ERROR_SHOW_FAIL_AD_NOT_READY;
+                return false;
+            }
             //
-            if (IsShow)
-            {
-                return adTrackingSource;
-            }
-            else
-            {
-                adTrackingSource = new AdBannerTrackingSource(this);
-                IsShow = true;
-                if (IsLoaded)
-                {
-                    MaxSdk.ShowMRec(AdId);
-                    PushEvent_Displayed(true);
-                    adTrackingSource.PushEvent_Displayed(true);
-                }
-                return adTrackingSource;
-            }
+            IsShow = true;
+            MaxSdk.SetMRecPlacement(AdId, Placement);
+            MaxSdk.ShowMRec(AdId);
+            PushEvent_Displayed(true);
+            //
+            error = null;
+            return true;
         }
-        public override void Hide()
+        protected override bool OnHide()
         {
-            if (IsShow)
-            {
-                MaxSdk.HideMRec(AdId);
-                IsShow = false;
-                //
-                PushEvent_Hidden();
-                adTrackingSource.PushEvent_Hidden();
-                adTrackingSource = null;
-            }
-            else
-            {
-                IsShow = false;
-            }
+            if (!IsShow)
+                return false;
+            //
+            MaxSdk.HideMRec(AdId);
+            IsShow = false;
+            //
+            PushEvent_Hidden();
+            return true;
         }
         #endregion
 
@@ -221,56 +213,32 @@ namespace KPlugin.AdMax
         #endregion
 
         #region Ad
+        private void Ad_Create_Begin()
+        {
+            if (isCreated || isCreating)
+                return;
+            isCreating = true;
+            //
+            if (AdMaxManager.IsReady())
+            {
+                Ad_Create();
+            }
+            else
+            {
+                CronObject.Create()
+                    .Add(ConditionDelegate.Create(AdMaxManager.IsReady))
+                    .Add(CallbackAction.Create(Ad_Create))
+                    .Run();
+            }
+        }
         private void Ad_Create()
-        {
-            if (IsLoaded || isLoading)
-                return;
-            isLoading = true;
-            //
-            float delay = attemptLoad > 0 ? Mathf.Pow(2, attemptLoad) : 0;
-            CronObject.Create()
-                .Add(ConditionReadTime.Create(delay))
-                .Add(ConditionDelegate.Create(AdMaxManager.IsReady))
-                .Add(CallbackAction.Create(Ad_LoadAd))
-                .Run();
-        }
-        private void Ad_Destroy()
-        {
-            if (!isCreateAdObject)
-            {
-                IsShow = false;
-                return;
-            }
-            //
-            if (IsLoaded)
-            {
-                if (IsShow)
-                {
-                    MaxSdk.HideBanner(AdId);
-                    IsShow = false;
-                    //
-                    PushEvent_Hidden();
-                    adTrackingSource.PushEvent_Hidden();
-                    adTrackingSource = null;
-                }
-                IsLoaded = false;
-            }
-            else if (IsShow)
-                IsShow = false;
-            //
-            Ad_EventUnRegister();
-            MaxSdk.DestroyBanner(AdId);
-            isCreateAdObject = false;
-        }
-        private void Ad_LoadAd()
         {
             if (IsDestroy)
             {
-                isLoading = false;
+                isCreating = false;
                 return;
             }
             //
-            Ad_EventRegister();
             AdViewConfiguration adViewConfiguration;
             if (PositionType == AdPosition.Custom)
             {
@@ -282,15 +250,72 @@ namespace KPlugin.AdMax
                 AdViewPosition viewPosition = Utility.ConvertPosition(PositionType);
                 adViewConfiguration = new MaxSdk.AdViewConfiguration(viewPosition);
             }
+            Ad_EventRegister();
             MaxSdk.CreateMRec(AdId, adViewConfiguration);
             if (!IsAutoReload)
                 MaxSdk.StopMRecAutoRefresh(AdId);
-            isCreateAdObject = true;
+            //
+            isCreating = false;
+            isCreated = true;
+            //
+            if (!IsAutoReload)
+                Ad_Load_Begin();
+        }
+        private void Ad_Destroy()
+        {
+            if (!isCreated)
+                return;
+            //
+            if (IsLoaded)
+            {
+                if (IsShow)
+                {
+                    MaxSdk.HideMRec(AdId);
+                    IsShow = false;
+                    //
+                    PushEvent_Hidden();
+                }
+                IsLoaded = false;
+            }
+            //
+            Ad_EventUnRegister();
+            MaxSdk.DestroyMRec(AdId);
+            isCreated = false;
+        }
+        private void Ad_Load_Begin()
+        {
+            if (!isCreated || IsLoaded || isLoading)
+                return;
+            isLoading = true;
+            //
+            float delay = attemptLoad > 0 ? Mathf.Pow(2, attemptLoad) : 0;
+            if (delay <= 0)
+            {
+                Ad_Load();
+            }
+            else
+            {
+                CronObject.Create()
+                    .Add(ConditionReadTime.Create(delay))
+                    .Add(CallbackAction.Create(Ad_Load))
+                    .Run();
+            }
+        }
+        private void Ad_Load()
+        {
+            if (IsDestroy)
+            {
+                isLoading = false;
+                return;
+            }
+            //
+            MaxSdk.LoadMRec(AdId);
         }
         private void Ad_OnAdLoadedEvent(string adId, AdInfo adInfo)
         {
-            if (adId != AdId)
+            if (!string.Equals(adId, AdId))
                 return;
+            //
             isLoading = false;
             if (IsDestroy)
                 return;
@@ -298,16 +323,13 @@ namespace KPlugin.AdMax
             IsLoaded = true;
             attemptLoad = 0;
             //
-            if (IsShow)
-                MaxSdk.ShowMRec(AdId);
-            else
-                MaxSdk.HideMRec(AdId);
             PushEvent_Loaded(true);
         }
         private void Ad_OnAdLoadFailedEvent(string adId, ErrorInfo errorInfo)
         {
-            if (adId != AdId)
+            if (!string.Equals(adId, AdId))
                 return;
+            //
             isLoading = false;
             if (IsDestroy)
                 return;
@@ -317,35 +339,36 @@ namespace KPlugin.AdMax
                 Debug.LogError(string.Format(ERROR_LOAD_FAIL, errorInfo.Code));
             //
             PushEvent_Loaded(false);
+            //
+            if (!IsAutoReload)
+                Ad_Load_Begin();
         }
         private void Ad_OnAdExpandedEvent(string adId, AdInfo adInfo)
         {
-            if (adId != AdId)
+            if (!string.Equals(adId, AdId))
                 return;
             //
             PushEvent_Expanded(true);
-            adTrackingSource.PushEvent_Expanded(true);
         }
         private void Ad_OnAdCollapsedEvent(string adId, AdInfo adInfo)
         {
-            if (adId != AdId)
+            if (!string.Equals(adId, AdId))
                 return;
             //
             PushEvent_Expanded(false);
-            adTrackingSource.PushEvent_Expanded(false);
         }
         private void Ad_OnAdClickedEvent(string adId, AdInfo adInfo)
         {
-            if (adId != AdId)
+            if (!string.Equals(adId, AdId))
                 return;
             //
             PushEvent_Clicked();
-            adTrackingSource.PushEvent_Clicked();
         }
         private void Ad_OnAdRevenuePaidEvent(string adId, AdInfo adInfo)
         {
-            if (adId != AdId)
+            if (!string.Equals(adId, AdId))
                 return;
+            //
             if (adInfo == null)
                 return;
             //
@@ -360,7 +383,6 @@ namespace KPlugin.AdMax
                 currency: AdMaxManager.MAX_CURRENCY);
             //
             PushEvent_RevenuePaid(revenuePaid);
-            adTrackingSource.PushEvent_RevenuePaid(revenuePaid);
         }
         private void Ad_OnAdReviewCreativeIdGeneratedEvent(string adId, string arg2, AdInfo adInfo)
         {

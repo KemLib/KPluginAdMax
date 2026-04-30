@@ -7,11 +7,7 @@ namespace KPlugin.AdMax.Example
     public class PanelAdRewarded : MonoBehaviour
     {
         #region Properties
-        private const string CLICK_INIT = "Ad Rewarded: Click init",
-            CLICK_LOAD = "Ad Rewarded: Click load",
-            CLICK_SHOW = "Ad Rewarded: Click show";
-        private const string AD_EVENT_INIT = "Ad Rewarded: even Init",
-            AD_EVENT_LOADED = "Ad Rewarded: even Loaded {0}",
+        private const string AD_EVENT_LOADED = "Ad Rewarded: even Loaded {0}",
             AD_EVENT_DISPLAYED = "Ad Rewarded: even Displayed {0}",
             AD_EVENT_CLICKED = "Ad Rewarded: even Clicked",
             AD_EVENT_HIDDEN = "Ad Rewarded: even Hidden",
@@ -19,10 +15,8 @@ namespace KPlugin.AdMax.Example
             AD_EVENT_DESTROY = "Ad Rewarded: even Destroy",
             AD_EVENT_RECEIVED_REWARD = "Ad Rewarded: even ReceivedReward {0}-{1}";
         private const string ERROR_ADD_EMPTY = "Ad Rewarded: No objects to select",
-            ERROR_AD_IS_INITED = "Ad Rewarded: ad is inited",
-            ERROR_AD_IS_NOT_INIT = "Ad Rewarded: ad not init",
             ERROR_AD_IS_LOADED = "Ad Rewarded: ad is loaded",
-            ERROR_AD_SHOW = "Ad Rewarded show success",
+            AD_SHOW_SUCCESS = "Ad Rewarded show success",
             ERROR_AD_SHOW_FAIL = "Ad Rewarded show fail: {0}";
 
         [SerializeField]
@@ -92,28 +86,12 @@ namespace KPlugin.AdMax.Example
             selectAd = manager.Rewarded_Get(value);
             SelectAd_EventRegister();
         }
-        public void OnClick_Init()
-        {
-            if (!IsShow)
-                return;
-            //
-            panelLog.AddLog(CLICK_INIT);
-            //
-            if (SelectAd.IsInited)
-                panelLog.AddLog(ERROR_AD_IS_INITED);
-            else
-                SelectAd.Init();
-        }
         public void OnClick_Load()
         {
             if (!IsShow)
                 return;
             //
-            panelLog.AddLog(CLICK_LOAD);
-            //
-            if (!SelectAd.IsInited)
-                panelLog.AddLog(ERROR_AD_IS_NOT_INIT);
-            else if (SelectAd.IsLoaded)
+            if (SelectAd.IsLoaded)
                 panelLog.AddLog(ERROR_AD_IS_LOADED);
             else
                 SelectAd.Load();
@@ -123,11 +101,9 @@ namespace KPlugin.AdMax.Example
             if (!IsShow)
                 return;
             //
-            panelLog.AddLog(CLICK_SHOW);
-            //
             IAdRewardedTracking adTracking = SelectAd.Show();
             if (adTracking.IsComplete)
-                panelLog.AddLog(ERROR_AD_SHOW);
+                panelLog.AddLog(AD_SHOW_SUCCESS);
             else
                 panelLog.AddLog(string.Format(ERROR_AD_SHOW_FAIL, adTracking.ErrorMessage));
         }
@@ -139,7 +115,6 @@ namespace KPlugin.AdMax.Example
             if (selectAd == null)
                 return;
             //
-            selectAd.OnAdInited += SelectAd_OnAdInited;
             selectAd.OnAdLoaded += SelectAd_OnAdLoaded;
             selectAd.OnAdDisplayed += SelectAd_OnAdDisplayed;
             selectAd.OnAdClicked += SelectAd_OnAdClicked;
@@ -148,52 +123,46 @@ namespace KPlugin.AdMax.Example
             selectAd.OnAdDestroy += SelectAd_OnAdDestroy;
             selectAd.OnAdReceivedReward += SelectAd_OnAdReceivedReward;
         }
-
         private void SelectAd_EventUnRegister()
         {
             if (selectAd == null)
                 return;
             //
-            selectAd.OnAdInited -= SelectAd_OnAdInited;
             selectAd.OnAdLoaded -= SelectAd_OnAdLoaded;
             selectAd.OnAdDisplayed -= SelectAd_OnAdDisplayed;
             selectAd.OnAdClicked -= SelectAd_OnAdClicked;
             selectAd.OnAdHidden -= SelectAd_OnAdHidden;
             selectAd.OnAdRevenuePaid -= SelectAd_OnAdRevenuePaid;
-            selectAd.OnAdDestroy -= SelectAd_OnAdDestroy;
             selectAd.OnAdReceivedReward -= SelectAd_OnAdReceivedReward;
+            selectAd.OnAdDestroy -= SelectAd_OnAdDestroy;
         }
-        private void SelectAd_OnAdInited(Ad adSource, bool isSuccess)
-        {
-            panelLog.AddLog(AD_EVENT_INIT);
-        }
-        private void SelectAd_OnAdLoaded(Ad adSource, bool isSuccess)
+        private void SelectAd_OnAdLoaded(AdBase adSource, bool isSuccess)
         {
             panelLog.AddLog(string.Format(AD_EVENT_LOADED, isSuccess));
         }
-        private void SelectAd_OnAdDisplayed(Ad adSource, bool isSuccess)
+        private void SelectAd_OnAdDisplayed(AdBase adSource, bool isSuccess, string placement)
         {
             panelLog.AddLog(string.Format(AD_EVENT_DISPLAYED, isSuccess));
         }
-        private void SelectAd_OnAdClicked(Ad adSource)
+        private void SelectAd_OnAdClicked(AdBase adSource, string placement)
         {
             panelLog.AddLog(AD_EVENT_CLICKED);
         }
-        private void SelectAd_OnAdHidden(Ad adSource)
+        private void SelectAd_OnAdHidden(AdBase adSource, string placement)
         {
             panelLog.AddLog(AD_EVENT_HIDDEN);
         }
-        private void SelectAd_OnAdRevenuePaid(Ad adSource, AdRevenuePaid revenuePaid)
+        private void SelectAd_OnAdRevenuePaid(AdBase adSource, AdRevenuePaid revenuePaid, string placement)
         {
             panelLog.AddLog(string.Format(AD_EVENT_REVENUE_PAID, revenuePaid.Value, revenuePaid.Currency));
         }
-        private void SelectAd_OnAdDestroy(Ad adSource)
-        {
-            panelLog.AddLog(AD_EVENT_DESTROY);
-        }
-        private void SelectAd_OnAdReceivedReward(Ad adSource, AdRewardReceived rewardReceived)
+        private void SelectAd_OnAdReceivedReward(AdBase adSource, AdRewardReceived rewardReceived, string placement)
         {
             panelLog.AddLog(string.Format(AD_EVENT_RECEIVED_REWARD, rewardReceived.Label, rewardReceived.Value));
+        }
+        private void SelectAd_OnAdDestroy(AdBase adSource)
+        {
+            panelLog.AddLog(AD_EVENT_DESTROY);
         }
         #endregion
     }

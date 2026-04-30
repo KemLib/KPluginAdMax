@@ -100,8 +100,6 @@ namespace KPlugin.AdMax
             isIniting = true;
             //
             initTrackingSource = new InitTrackingSource(initIndispensable);
-            if (!string.IsNullOrEmpty(AdMaxSetting.Instance.UserId))
-                MaxSdk.SetUserId(AdMaxSetting.Instance.UserId);
             MaxSdkCallbacks.OnSdkInitializedEvent += Max_OnSdkInitializedEvent;
             MaxSdk.InitializeSdk();
             return initTrackingSource;

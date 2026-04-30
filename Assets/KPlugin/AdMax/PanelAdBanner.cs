@@ -7,10 +7,6 @@ namespace KPlugin.AdMax.Example
     public class PanelAdBanner : MonoBehaviour
     {
         #region Properties
-        private const string CLICK_INIT = "Ad Banner: Click init",
-            CLICK_LOAD = "Ad Banner: Click load",
-            CLICK_SHOW = "Ad Banner: Click show",
-            CLICK_HIDE = "Ad Banner: Click hide";
         private const string AD_EVENT_INIT = "Ad Banner: even Init",
             AD_EVENT_LOADED = "Ad Banner: even Loaded {0}",
             AD_EVENT_DISPLAYED = "Ad Banner: even Displayed {0}",
@@ -91,28 +87,12 @@ namespace KPlugin.AdMax.Example
             selectAd = manager.Banner_Get(value);
             SelectAd_EventRegister();
         }
-        public void OnClick_Init()
-        {
-            if (!IsShow)
-                return;
-            //
-            panelLog.AddLog(CLICK_INIT);
-            //
-            if (SelectAd.IsInited)
-                panelLog.AddLog(ERROR_AD_IS_INITED);
-            else
-                SelectAd.Init();
-        }
         public void OnClick_Load()
         {
             if (!IsShow)
                 return;
             //
-            panelLog.AddLog(CLICK_LOAD);
-            //
-            if (!SelectAd.IsInited)
-                panelLog.AddLog(ERROR_AD_IS_NOT_INIT);
-            else if (SelectAd.IsLoaded)
+            if (SelectAd.IsLoaded)
                 panelLog.AddLog(ERROR_AD_IS_LOADED);
             else
                 SelectAd.Load();
@@ -122,16 +102,12 @@ namespace KPlugin.AdMax.Example
             if (!IsShow)
                 return;
             //
-            panelLog.AddLog(CLICK_SHOW);
-            //
             SelectAd.Show();
         }
         public void OnClick_Hide()
         {
             if (!IsShow)
                 return;
-            //
-            panelLog.AddLog(CLICK_HIDE);
             //
             SelectAd.Hide();
         }
@@ -143,7 +119,6 @@ namespace KPlugin.AdMax.Example
             if (selectAd == null)
                 return;
             //
-            selectAd.OnAdInited += SelectAd_OnAdInited;
             selectAd.OnAdLoaded += SelectAd_OnAdLoaded;
             selectAd.OnAdDisplayed += SelectAd_OnAdDisplayed;
             selectAd.OnAdClicked += SelectAd_OnAdClicked;
@@ -157,45 +132,41 @@ namespace KPlugin.AdMax.Example
             if (selectAd == null)
                 return;
             //
-            selectAd.OnAdInited -= SelectAd_OnAdInited;
             selectAd.OnAdLoaded -= SelectAd_OnAdLoaded;
             selectAd.OnAdDisplayed -= SelectAd_OnAdDisplayed;
             selectAd.OnAdClicked -= SelectAd_OnAdClicked;
             selectAd.OnAdHidden -= SelectAd_OnAdHidden;
             selectAd.OnAdRevenuePaid -= SelectAd_OnAdRevenuePaid;
             selectAd.OnAdDestroy -= SelectAd_OnAdDestroy;
+            selectAd.OnAdExpanded -= SelectAd_OnAdExpanded;
         }
-        private void SelectAd_OnAdInited(Ad adSource, bool isSuccess)
-        {
-            panelLog.AddLog(AD_EVENT_INIT);
-        }
-        private void SelectAd_OnAdLoaded(Ad adSource, bool isSuccess)
+        private void SelectAd_OnAdLoaded(AdBase adSource, bool isSuccess)
         {
             panelLog.AddLog(string.Format(AD_EVENT_LOADED, isSuccess));
         }
-        private void SelectAd_OnAdDisplayed(Ad adSource, bool isSuccess)
+        private void SelectAd_OnAdDisplayed(AdBase adSource, bool isSuccess, string placement)
         {
             panelLog.AddLog(string.Format(AD_EVENT_DISPLAYED, isSuccess));
         }
-        private void SelectAd_OnAdClicked(Ad adSource)
+        private void SelectAd_OnAdClicked(AdBase adSource, string placement)
         {
             panelLog.AddLog(AD_EVENT_CLICKED);
         }
-        private void SelectAd_OnAdHidden(Ad adSource)
+        private void SelectAd_OnAdHidden(AdBase adSource, string placement)
         {
             panelLog.AddLog(AD_EVENT_HIDDEN);
         }
-        private void SelectAd_OnAdRevenuePaid(Ad adSource, AdRevenuePaid revenuePaid)
+        private void SelectAd_OnAdRevenuePaid(AdBase adSource, AdRevenuePaid revenuePaid, string placement)
         {
             panelLog.AddLog(string.Format(AD_EVENT_REVENUE_PAID, revenuePaid.Value, revenuePaid.Currency));
         }
-        private void SelectAd_OnAdDestroy(Ad adSource)
-        {
-            panelLog.AddLog(AD_EVENT_DESTROY);
-        }
-        private void SelectAd_OnAdExpanded(Ad adSource, bool isExpanded)
+        private void SelectAd_OnAdExpanded(AdBase adSource, bool isExpanded, string placement)
         {
             panelLog.AddLog(string.Format(AD_EVENT_EXPANDED, isExpanded));
+        }
+        private void SelectAd_OnAdDestroy(AdBase adSource)
+        {
+            panelLog.AddLog(AD_EVENT_DESTROY);
         }
         #endregion
     }

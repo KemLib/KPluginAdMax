@@ -1,5 +1,5 @@
 {
-    "name": "KPluginAdMaxMediationEditor",
+    "name": "KPluginAdMaxEditor",
     "rootNamespace": "",
     "references": [
         "GUID:47b1bdd8bf9052b40b56c65b51bfea0d",

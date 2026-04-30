@@ -19,17 +19,12 @@ namespace KPlugin.AdMax
                 return instance;
             }
         }
-
-        [SerializeField]
-        private string userId;
         [SerializeField]
         private AdMaxSettingAdId[] appOpenIds,
             bannerIds,
             mrecIds,
             interstitialIds,
             rewardedIds;
-
-        public string UserId => userId;
         #endregion
 
         #region Unity Event

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9c7ab015d00134499982d482de11681, type: 3}
+  m_Name: AdMaxSetting
+  m_EditorClassIdentifier: 
+  userId: 
+  appOpenIds:
+  - androidId: default_id_app_open
+    iosId: default_id_app_open
+  bannerIds:
+  - androidId: default_id_banner
+    iosId: default_id_banner
+  mrecIds:
+  - androidId: default_id_mrec
+    iosId: default_id_mrec
+  interstitialIds:
+  - androidId: default_id_inter
+    iosId: default_id_inter
+  rewardedIds:
+  - androidId: default_id_reward
+    iosId: default_id_reward

@@ -2,7 +2,7 @@
 using KTool.Init;
 using UnityEngine;
 
-namespace KPlugin.AdMax
+namespace KPlugin.AdMax.Example
 {
     public class LoadScene : MonoBehaviour
     {

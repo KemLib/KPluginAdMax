@@ -7,8 +7,7 @@ namespace KPlugin.AdMax.Example
     public class PanelAdBanner : MonoBehaviour
     {
         #region Properties
-        private const string AD_EVENT_INIT = "Ad Banner: even Init",
-            AD_EVENT_LOADED = "Ad Banner: even Loaded {0}",
+        private const string AD_EVENT_LOADED = "Ad Banner: even Loaded {0}",
             AD_EVENT_DISPLAYED = "Ad Banner: even Displayed {0}",
             AD_EVENT_CLICKED = "Ad Banner: even Clicked",
             AD_EVENT_HIDDEN = "Ad Banner: even Hidden",
@@ -16,8 +15,6 @@ namespace KPlugin.AdMax.Example
             AD_EVENT_DESTROY = "Ad Banner: even Destroy",
             AD_EVENT_EXPANDED = "Ad Banner: even Expanded {0}";
         private const string ERROR_ADD_EMPTY = "Ad Banner: No objects to select",
-            ERROR_AD_IS_INITED = "Ad Banner: ad is inited",
-            ERROR_AD_IS_NOT_INIT = "Ad Banner: ad not init",
             ERROR_AD_IS_LOADED = "Ad Banner: ad is loaded";
 
         [SerializeField]

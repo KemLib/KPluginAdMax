@@ -12,7 +12,6 @@ namespace KPlugin.AdMax.Editor
         public const string ASSET_Ad_Max_SETTING_PATH = ASSET_AD_MAX_SETTING_FOLDER_NAME + "/" + ASSET_AD_MAX_SETTING_FILE_NAME + ".asset";
 
         private ApplovinSettingEditor applovinSettingEditor;
-        private SerializedProperty propertyUserId;
         private AdMaxSettingAdIdEditor appOpenSetting,
             bannerSetting,
             mrecSetting,
@@ -30,7 +29,6 @@ namespace KPlugin.AdMax.Editor
         {
             OnGui_AppLovinSetting();
             GUILayout.Space(5);
-            EditorGUILayout.PropertyField(propertyUserId, new GUIContent("User Id"));
             GUILayout.Space(5);
             OnGui_AppLovinMaxSetting();
         }
@@ -60,7 +58,6 @@ namespace KPlugin.AdMax.Editor
         private void Init()
         {
             applovinSettingEditor = new ApplovinSettingEditor();
-            propertyUserId = serializedObject.FindProperty("userId");
             SerializedProperty propertyAppOpenIds = serializedObject.FindProperty("appOpenIds"),
                 propertyBannerIds = serializedObject.FindProperty("bannerIds"),
                 propertyMrecIds = serializedObject.FindProperty("mrecIds"),
